@@ -34,6 +34,7 @@ $(document).ready(function() {
             l.append($("<span>").text("Yo, "))
               .append($("<span>").text(data.email).addClass("username"))
               .append($("<span>!</span>"));
+            l.append($('<div><a href="/" >(logout)</a></div>'));
             l.unbind('click');
 
             var iurl = 'http://www.gravatar.com/avatar/' +
