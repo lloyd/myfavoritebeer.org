@@ -1,8 +1,19 @@
-function loggedIn() {
+function loggedIn(email) {
   $("#content .intro").fadeOut(700, function() {
     $("#content .business").fadeIn(300, function() {
     });
   });
+
+  // enter causes us to save the value and do a little animation
+  $('input').keypress(function(e){
+    if(e.which == 13) {
+      window.localStorage.setItem(email, $("input").val());
+      $("#content input").fadeOut(200).fadeIn(400);
+      e.preventDefault();
+    }
+  });
+
+  $("input").val(window.localStorage.getItem(email));
 }
 
 $(document).ready(function() {
@@ -30,7 +41,7 @@ $(document).ready(function() {
               "?s=32";
             $("<img>").attr('src', iurl).appendTo($("#header .picture"));
 
-            loggedIn();
+            loggedIn(data.email);
           },
           error: function(jqXHR, textStatus, errorThrown) {
             $("#header .login").css('opacity', '1');
