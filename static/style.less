@@ -31,6 +31,10 @@ body {
         float: left;
     }
 
+    .picture {
+        float: right;
+        margin: 10px;
+    }
     .login {
         float: right;
         margin-top: 20px;
@@ -61,13 +65,25 @@ body {
     background-attachment:fixed;
     background-position:center;
 
-    .intro {
+    .intro, .business {
         width: 600px;
         margin: auto;
         color: #333;
         font-size: 2em;
         font-family: "Shadows Into Light";
         text-align: center;
+    }
+
+    .business input {
+        background-color: transparent;
+        border: 1px solid #999;
+        font-family: "Shadows Into Light";
+        padding: .4em;
+        font-size: 3em;
+        width: 500px;
+        border-radius: 50px 50px 50px 50px;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
     }
 }
 
@@ -97,6 +113,7 @@ body {
         img {
             margin-bottom: -.5em;
         }
+        font-weight: 200;
     }
 
     .smallPrint {
