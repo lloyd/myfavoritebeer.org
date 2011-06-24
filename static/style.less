@@ -1,0 +1,68 @@
+body {
+     margin: 0;
+     padding: 0;
+     font-family: 'lucida grande', helvetica, arial, sans-serif;
+}
+
+#header {
+    background-color: #143352;
+    color: #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    border-bottom: 2px solid rgba(15, 38, 61, 0.5);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 0 0 black;
+    z-index: 10;
+
+    > div {
+        width: 900px;
+        margin: auto;
+    }
+
+    .title {
+        font-family: "Special Elite";
+        font-size: 3em;
+        margin-top: 10px;
+        float: left;
+    }
+
+    .login {
+        float: right;
+        margin-top: 20px;
+        img {
+            margin-top: -7px;
+        }
+        .username {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    }
+    .clickable:hover {
+        opacity: .5;
+        cursor: pointer;
+    }
+}
+
+#content {
+    background-color: #4082C4;
+    position: fixed;
+    color: #fff;
+    top: 50px;
+    bottom: 200px;
+    left: 0;
+    right: 0;
+}
+
+#footer {
+    background-color: #262626;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+}
