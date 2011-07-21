@@ -28,11 +28,14 @@ function gotVerifiedEmail(assertion) {
   if (assertion) {
     // Now we'll send this assertion over to the verification server for validation
     // WARNING: This is only an example. In real apps, this verification step must be done from server-side code. 
-    var url = "https://browserid.org/verify?assertion=" + window.encodeURIComponent(assertion) +
-      "&audience=" + window.encodeURIComponent(window.location.host);
     $.ajax({
-      url: url,
+      url: 'https://browserid.org/verify',
+      type: 'POST',
       dataType: "json",
+      data: {
+        audience: window.location.host,
+        assertion: assertion
+      },
       success: function(data, textStatus, jqXHR) {
         var l = $("#header .login").removeClass('clickable');;
         l.empty();
