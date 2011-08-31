@@ -70,12 +70,12 @@ $(document).ready(function() {
   }).addClass("clickable");
 });
 
-document.addEventListener("login", function(event) {
+$(document).bind("login", function(event) {
   $("#header .login").css('opacity', '0.5');
   navigator.id.getVerifiedEmail(gotVerifiedEmail);
 },false);
 
-document.addEventListener("logout", function(event) {
+$(document).bind("logout", function(event) {
   window.location.href = "/";
 },false);
 
