@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
 if (process.env.BROWSERID_URL) {
   console.log("Using BrowserID at: " + process.env.BROWSERID_URL);
   app.use(postprocess.middleware(function(body) {
-    return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROSWERID_URL);
+    return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROWSERID_URL);
   }));
 }
 
@@ -55,10 +55,13 @@ app.get("/api/whoami", function (req, res) {
 });
 
 app.post("/api/login", function (req, res) {
+  // Verification needs to occur against what we are saying is BrowserID.
+  var verifyWith = process.env.BROWSERID_URL ? process.env.BROWSERID_URL.replace(/http(s?):\/\//, '') : "browserid.org";
+
   // req.body.assertion contains an assertion we should
   // verify, we'll use the browserid verification console
   var vreq = https.request({
-    host: "browserid.org",
+    host: verifyWith,
     path: "/verify",
     method: 'POST'
   }, function(vres) {
