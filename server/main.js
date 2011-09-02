@@ -92,7 +92,7 @@ app.post("/api/login", function (req, res) {
 });
 
 app.post("/api/logout", function (req, res) {
-  console.log("logout called");
+  req.session.email = null;
   res.json(true);
 });
 

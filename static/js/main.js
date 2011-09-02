@@ -14,8 +14,10 @@ function loggedIn(email) {
   l.append($("<span>").text("Yo, "))
     .append($("<span>").text(email).addClass("username"))
     .append($("<span>!</span>"));
-  l.append($('<div><a href="/" >(logout)</a></div>'));
+  l.append($('<div><a id="logout" href="#" >(logout)</a></div>'));
   l.unbind('click');
+  
+  $("#logout").bind('click', logout);
 
   $("#content .intro").fadeOut(700, function() {
     $("#content .business").fadeIn(300, function() {
@@ -39,6 +41,18 @@ function loggedIn(email) {
     "?s=32";
   $("<img>").attr('src', iurl).appendTo($("#header .picture"));
 }
+
+function logout(event) {
+  event.preventDefault();
+  $.ajax({
+    type: 'POST',
+    url: '/api/logout',
+    success: function() {
+      document.location = '/';
+    }
+  });
+}
+
 
 function loggedOut() {
   setSessions();
@@ -74,9 +88,7 @@ $(document).bind("login", function(event) {
   navigator.id.getVerifiedEmail(gotVerifiedEmail);
 },false);
 
-$(document).bind("logout", function(event) {
-  window.location.href = "/";
-},false);
+$(document).bind("logout", logout);
 
 $(function() {
   $.get('/api/whoami', function (res) {
