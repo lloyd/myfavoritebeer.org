@@ -42,7 +42,7 @@ app.use(function (req, res, next) {
 
 // a substitution middleware allows us to easily point at different browserid servers
 if (process.env.BROWSERID_URL) {
-  console.log("Using BrowserID at: " + process.env.BROSWERID_URL);
+  console.log("Using BrowserID at: " + process.env.BROWSERID_URL);
   app.use(postprocess.middleware(function(body) {
     return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROSWERID_URL);
   }));
