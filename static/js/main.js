@@ -1,3 +1,10 @@
+// IE needs this to be able to style HTML5 elements properly
+var els = ['header'|'footer'|'small'];
+for(var type, i = 0; type=els[i]; ++i) {
+  document.createElement(els);
+}
+
+
 function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
@@ -8,7 +15,7 @@ function loggedIn(email) {
   setSessions([ { email: email } ]);
 
   // set the user visible display
-  var l = $("#header .login").removeClass('clickable');;
+  var l = $("header .login").removeClass('clickable');;
   l.empty();
   l.css('opacity', '1');
   l.append($("<span>").text("Yo, "))
@@ -39,7 +46,7 @@ function loggedIn(email) {
   var iurl = 'http://www.gravatar.com/avatar/' +
     Crypto.MD5($.trim(email).toLowerCase()) +
     "?s=32";
-  $("<img>").attr('src', iurl).appendTo($("#header .picture"));
+  $("<img>").attr('src', iurl).appendTo($("header .picture"));
 }
 
 function logout(event) {
@@ -56,11 +63,11 @@ function logout(event) {
 
 function loggedOut() {
   setSessions();
-  var l = $("#header .login").removeClass('clickable');
+  var l = $("header .login").removeClass('clickable');
   console.log("creating login button");
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
-      $("#header .login").css('opacity', '0.5');
+      $("header .login").css('opacity', '0.5');
       navigator.id.getVerifiedEmail(gotVerifiedEmail);
     }).addClass("clickable");
 }
@@ -84,7 +91,7 @@ function gotVerifiedEmail(assertion) {
 }
 
 $(document).bind("login", function(event) {
-  $("#header .login").css('opacity', '0.5');
+  $("header .login").css('opacity', '0.5');
   navigator.id.getVerifiedEmail(gotVerifiedEmail);
 },false);
 

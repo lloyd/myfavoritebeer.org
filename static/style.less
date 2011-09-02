@@ -4,7 +4,8 @@ body {
     font-family: 'lucida grande', helvetica, arial, sans-serif;
 }
 
-#header {
+header {
+    display: block;
     background-color: #143352;
     color: #ddd;
     position: fixed;
@@ -13,10 +14,9 @@ body {
     height: 50px;
     width: 100%;
     border-bottom: 2px solid rgba(15, 38, 61, 0.5);
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
     -moz-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
     -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
-    -moz-box-shadow: 0 0 0 black;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
     z-index: 10;
     opacity: .8;
 
@@ -25,10 +25,9 @@ body {
         margin: auto;
     }
 
-    .title {
-        font-family: "Special Elite";
-        font-size: 3em;
-        margin-top: 10px;
+    h1 {
+        font: 3em/50px "Special Elite";
+        margin: 10px 0 0 0;
         float: left;
     }
 
@@ -89,17 +88,17 @@ body {
     .business input {
         background-color: transparent;
         border: 1px solid #999;
-        font-family: "Shadows Into Light";
+        font: 3em "Shadows Into Light";
         padding: .4em;
-        font-size: 3em;
         width: 500px;
-        border-radius: 50px 50px 50px 50px;
         -moz-border-radius: 50px;
         -webkit-border-radius: 50px;
+        border-radius: 50px;
     }
 }
 
-#footer {
+footer {
+    display: block;
     background-color: #9d9d9d;
     color: #313131;
     position: fixed;
@@ -129,7 +128,8 @@ body {
         font-weight: 200;
     }
 
-    .smallPrint {
+    small {
+        display: block;
         font-size: .8em;
         opacity: .8;
         margin-top: 1.5em;
