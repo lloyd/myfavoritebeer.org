@@ -71,7 +71,11 @@ app.post("/api/login", function (req, res) {
     vres.on('data', function(chunk) { body+=chunk; } )
         .on('end', function() {
           console.log(body);
-          res.json(false);
+
+          var verifierResp = JSON.parse(body);
+          var valid = verifierResp && verifierResp.status === "okay";
+
+          res.json(valid ? verifierResp : null);
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');

@@ -4,8 +4,8 @@ function setSessions(val) {
   }
 } 
 
-function loggedIn(email) {
-  setSessions([ { email: email } ]);
+function loggedIn(data) {
+  setSessions([ { email: data.email } ]);
 
   // set the user visible display
   var l = $("#header .login").removeClass('clickable');;
@@ -54,11 +54,19 @@ function loggedOut() {
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
   console.log("send ass", assertion);
-  $.post('/api/login', { assertion: assertion }, function(res) {
-    console.log("got res", res);
-    if (res.body === null) loggedOut();
-    else loggedIn(res.body);
-  }, 'res');
+  $.ajax({
+    type: 'POST',
+    url: '/api/login',
+    data: { assertion: assertion },
+    success: function(res, status, xhr) {
+      console.log("got res", res);
+      if (res === null) loggedOut();
+      else loggedIn(res);
+    },
+    error: function(res, status, xhr) {
+      console.log("login failure" + res);
+    }
+  });
 }
 
 $(document).bind("login", function(event) {
