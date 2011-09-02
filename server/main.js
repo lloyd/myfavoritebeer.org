@@ -12,6 +12,8 @@ querystring = require('querystring');
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
+// fullServerAddress is set once the server is started - contains hostname:port
+var fullServerAddress;
 var app = express.createServer();
 
 // do some logging
@@ -67,15 +69,15 @@ app.post("/api/login", function (req, res) {
   }, function(vres) {
     var body = "";
     vres.on('data', function(chunk) { body+=chunk; } )
-      .on('end', function() {
-        console.log(body);
-        res.json(false);
+        .on('end', function() {
+          console.log(body);
+          res.json(false);
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
   var data = querystring.stringify({
     assertion: req.body.assertion,
-    audience: '127.0.0.1:3000' // XXX
+    audience: fullServerAddress
   });
   vreq.setHeader('Content-Length', data.length);
   vreq.write(data);
@@ -101,5 +103,7 @@ app.get("/api/set", function (req, res) {
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
 app.listen(process.env.PORT || 0, '127.0.0.1', function () {
-  console.log("listening on http://127.0.0.1:" + app.address().port);
+  var address = app.address();
+  fullServerAddress = address.address + ':' + address.port;
+  console.log("listening on " + fullServerAddress);
 });
