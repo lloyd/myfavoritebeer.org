@@ -12,10 +12,12 @@ function loggedIn(email) {
   l.empty();
   l.css('opacity', '1');
   l.append($("<span>").text("Yo, "))
-    .append($("<span>").text(data.email).addClass("username"))
+    .append($("<span>").text(email).addClass("username"))
     .append($("<span>!</span>"));
-  l.append($('<div><a href="/" >(logout)</a></div>'));
+  l.append($('<div><a id="logout" href="#" >(logout)</a></div>'));
   l.unbind('click');
+  
+  $("#logout").bind('click', logout);
 
   $("#content .intro").fadeOut(700, function() {
     $("#content .business").fadeIn(300, function() {
@@ -35,10 +37,22 @@ function loggedIn(email) {
 
   // get a gravatar cause it's pretty
   var iurl = 'http://www.gravatar.com/avatar/' +
-    Crypto.MD5($.trim(data.email).toLowerCase()) +
+    Crypto.MD5($.trim(email).toLowerCase()) +
     "?s=32";
   $("<img>").attr('src', iurl).appendTo($("#header .picture"));
 }
+
+function logout(event) {
+  event.preventDefault();
+  $.ajax({
+    type: 'POST',
+    url: '/api/logout',
+    success: function() {
+      document.location = '/';
+    }
+  });
+}
+
 
 function loggedOut() {
   setSessions();
@@ -54,11 +68,19 @@ function loggedOut() {
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
   console.log("send ass", assertion);
-  $.post('/api/login', { assertion: assertion }, function(res) {
-    console.log("got res", res);
-    if (res.body === null) loggedOut();
-    else loggedIn(res.body);
-  }, 'res');
+  $.ajax({
+    type: 'POST',
+    url: '/api/login',
+    data: { assertion: assertion },
+    success: function(res, status, xhr) {
+      console.log("got res", res);
+      if (res === null) loggedOut();
+      else loggedIn(res);
+    },
+    error: function(res, status, xhr) {
+      console.log("login failure" + res);
+    }
+  });
 }
 
 $(document).bind("login", function(event) {
@@ -66,11 +88,9 @@ $(document).bind("login", function(event) {
   navigator.id.getVerifiedEmail(gotVerifiedEmail);
 },false);
 
-$(document).bind("logout", function(event) {
-  window.location.href = "/";
-},false);
+$(document).bind("logout", logout);
 
-$(document).ready(function() {
+$(function() {
   $.get('/api/whoami', function (res) {
     console.log(res);
     if (res === null) loggedOut();

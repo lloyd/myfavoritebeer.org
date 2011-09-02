@@ -12,6 +12,8 @@ querystring = require('querystring');
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
+// fullServerAddress is set once the server is started - contains hostname:port
+var fullServerAddress;
 var app = express.createServer();
 
 // do some logging
@@ -44,7 +46,7 @@ app.use(function (req, res, next) {
 if (process.env.BROWSERID_URL) {
   console.log("Using BrowserID at: " + process.env.BROWSERID_URL);
   app.use(postprocess.middleware(function(body) {
-    return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROSWERID_URL);
+    return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROWSERID_URL);
   }));
 }
 
@@ -55,24 +57,34 @@ app.get("/api/whoami", function (req, res) {
 });
 
 app.post("/api/login", function (req, res) {
+  // Verification needs to occur against what we are saying is BrowserID.
+  var verifyWith = process.env.BROWSERID_URL ? process.env.BROWSERID_URL.replace(/http(s?):\/\//, '') : "browserid.org";
+
   // req.body.assertion contains an assertion we should
   // verify, we'll use the browserid verification console
   var vreq = https.request({
-    host: "browserid.org",
+    host: verifyWith,
     path: "/verify",
     method: 'POST'
   }, function(vres) {
     var body = "";
     vres.on('data', function(chunk) { body+=chunk; } )
-      .on('end', function() {
-        console.log(body);
-        res.json(false);
+        .on('end', function() {
+          console.log(body);
+
+          var verifierResp = JSON.parse(body);
+          var valid = verifierResp && verifierResp.status === "okay";
+          var email = valid ? verifierResp.email : null;
+
+          req.session.email = email;
+
+          res.json(email);
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
   var data = querystring.stringify({
     assertion: req.body.assertion,
-    audience: '127.0.0.1:3000' // XXX
+    audience: fullServerAddress
   });
   vreq.setHeader('Content-Length', data.length);
   vreq.write(data);
@@ -80,8 +92,8 @@ app.post("/api/login", function (req, res) {
 });
 
 app.post("/api/logout", function (req, res) {
-  console.log("logout called");
-  res.json(false);
+  req.session.email = null;
+  res.json(true);
 });
 
 app.get("/api/get", function (req, res) {
@@ -98,5 +110,7 @@ app.get("/api/set", function (req, res) {
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
 app.listen(process.env.PORT || 0, '127.0.0.1', function () {
-  console.log("listening on http://127.0.0.1:" + app.address().port);
+  var address = app.address();
+  fullServerAddress = address.address + ':' + address.port;
+  console.log("listening on " + fullServerAddress);
 });
