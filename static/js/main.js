@@ -4,6 +4,9 @@ for(var type, i = 0; type=els[i]; ++i) {
   document.createElement(els);
 }
 
+// Add these in for IE that does not have dev tools open
+window.console = window.console || {};
+console.log = console.log || function() {};
 
 function setSessions(val) {
   if (navigator.id) {
@@ -11,7 +14,7 @@ function setSessions(val) {
   }
 } 
 
-function loggedIn(email) {
+function loggedIn(email, immediate) {
   setSessions([ { email: email } ]);
 
   // set the user visible display
@@ -26,10 +29,16 @@ function loggedIn(email) {
   
   $("#logout").bind('click', logout);
 
-  $("#content .intro").fadeOut(700, function() {
-    $("#content .business").fadeIn(300, function() {
+  if (immediate) {
+    $("#content .intro").hide();
+    $("#content .business").fadeIn(300);
+  }
+  else {
+    $("#content .intro").fadeOut(700, function() {
+      $("#content .business").fadeIn(300);
     });
-  });
+  }
+
 
   // enter causes us to save the value and do a little animation
   $('input').keypress(function(e){
@@ -63,6 +72,7 @@ function logout(event) {
 
 function loggedOut() {
   setSessions();
+  $('.intro').fadeIn(300);
   var l = $("header .login").removeClass('clickable');
   console.log("creating login button");
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
@@ -101,6 +111,6 @@ $(function() {
   $.get('/api/whoami', function (res) {
     console.log(res);
     if (res === null) loggedOut();
-    else loggedIn(res);
+    else loggedIn(res, true);
   }, 'json');
 });
