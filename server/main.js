@@ -31,7 +31,7 @@ var cookieSession = sessions({
     path: '/api',
     httpOnly: true,
     // when you're logged in, you're logged in for an hour
-    maxAge: (1 * 60 * 1000), 
+    maxAge: (1 * 60 * 60 * 1000), 
     secure: false
   }
 });
