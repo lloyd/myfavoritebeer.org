@@ -5,14 +5,15 @@ function setSessions(val) {
 } 
 
 function loggedIn(data) {
-  setSessions([ { email: data.email } ]);
+  var email = data.email;
+  setSessions([ { email: email } ]);
 
   // set the user visible display
   var l = $("#header .login").removeClass('clickable');;
   l.empty();
   l.css('opacity', '1');
   l.append($("<span>").text("Yo, "))
-    .append($("<span>").text(data.email).addClass("username"))
+    .append($("<span>").text(email).addClass("username"))
     .append($("<span>!</span>"));
   l.append($('<div><a href="/" >(logout)</a></div>'));
   l.unbind('click');
@@ -35,7 +36,7 @@ function loggedIn(data) {
 
   // get a gravatar cause it's pretty
   var iurl = 'http://www.gravatar.com/avatar/' +
-    Crypto.MD5($.trim(data.email).toLowerCase()) +
+    Crypto.MD5($.trim(email).toLowerCase()) +
     "?s=32";
   $("<img>").attr('src', iurl).appendTo($("#header .picture"));
 }
