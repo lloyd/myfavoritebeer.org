@@ -4,8 +4,7 @@ function setSessions(val) {
   }
 } 
 
-function loggedIn(data) {
-  var email = data.email;
+function loggedIn(email) {
   setSessions([ { email: email } ]);
 
   // set the user visible display
@@ -79,7 +78,7 @@ $(document).bind("logout", function(event) {
   window.location.href = "/";
 },false);
 
-$(document).ready(function() {
+$(function() {
   $.get('/api/whoami', function (res) {
     console.log(res);
     if (res === null) loggedOut();

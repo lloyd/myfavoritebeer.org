@@ -74,8 +74,11 @@ app.post("/api/login", function (req, res) {
 
           var verifierResp = JSON.parse(body);
           var valid = verifierResp && verifierResp.status === "okay";
+          var email = valid ? verifierResp.email : null;
 
-          res.json(valid ? verifierResp : null);
+          req.session.email = email;
+
+          res.json(email);
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -90,7 +93,7 @@ app.post("/api/login", function (req, res) {
 
 app.post("/api/logout", function (req, res) {
   console.log("logout called");
-  res.json(false);
+  res.json(true);
 });
 
 app.get("/api/get", function (req, res) {
