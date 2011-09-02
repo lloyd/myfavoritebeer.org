@@ -7,6 +7,16 @@ function setSessions(val) {
 function loggedIn(email) {
   setSessions([ { email: email } ]);
 
+  // set the user visible display
+  var l = $("#header .login").removeClass('clickable');;
+  l.empty();
+  l.css('opacity', '1');
+  l.append($("<span>").text("Yo, "))
+    .append($("<span>").text(data.email).addClass("username"))
+    .append($("<span>!</span>"));
+  l.append($('<div><a href="/" >(logout)</a></div>'));
+  l.unbind('click');
+
   $("#content .intro").fadeOut(700, function() {
     $("#content .business").fadeIn(300, function() {
     });
@@ -22,53 +32,34 @@ function loggedIn(email) {
   });
 
   $("input").val(window.localStorage.getItem(email));
+
+  // get a gravatar cause it's pretty
+  var iurl = 'http://www.gravatar.com/avatar/' +
+    Crypto.MD5($.trim(data.email).toLowerCase()) +
+    "?s=32";
+  $("<img>").attr('src', iurl).appendTo($("#header .picture"));
+}
+
+function loggedOut() {
+  setSessions();
+  var l = $("#header .login").removeClass('clickable');
+  console.log("creating login button");
+  l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
+    .show().click(function() {
+      $("#header .login").css('opacity', '0.5');
+      navigator.id.getVerifiedEmail(gotVerifiedEmail);
+    }).addClass("clickable");
 }
 
 function gotVerifiedEmail(assertion) {
-  if (assertion) {
-    // Now we'll send this assertion over to the verification server for validation
-    // WARNING: This is only an example. In real apps, this verification step must be done from server-side code. 
-    $.ajax({
-      url: 'https://browserid.org/verify',
-      type: 'POST',
-      dataType: "json",
-      data: {
-        audience: window.location.host,
-        assertion: assertion
-      },
-      success: function(data, textStatus, jqXHR) {
-        var l = $("#header .login").removeClass('clickable');;
-        l.empty();
-        l.css('opacity', '1');
-        l.append($("<span>").text("Yo, "))
-          .append($("<span>").text(data.email).addClass("username"))
-          .append($("<span>!</span>"));
-        l.append($('<div><a href="/" >(logout)</a></div>'));
-        l.unbind('click');
-
-        var iurl = 'http://www.gravatar.com/avatar/' +
-          Crypto.MD5($.trim(data.email).toLowerCase()) +
-          "?s=32";
-        $("<img>").attr('src', iurl).appendTo($("#header .picture"));
-
-        loggedIn(data.email);
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        $("#header .login").css('opacity', '1');
-      }
-    });
-  } else {
-    // something went wrong!  the user isn't logged in.
-    $("#header .login").css('opacity', '1');
-  }
+  // got an assertion, now send it up to the server for verification
+  console.log("send ass", assertion);
+  $.post('/api/login', { assertion: assertion }, function(res) {
+    console.log("got res", res);
+    if (res.body === null) loggedOut();
+    else loggedIn(res.body);
+  }, 'res');
 }
-
-$(document).ready(function() {
-  $("#header .login").show().click(function() {
-    $("#header .login").css('opacity', '0.5');
-    navigator.id.getVerifiedEmail(gotVerifiedEmail);
-  }).addClass("clickable");
-});
 
 $(document).bind("login", function(event) {
   $("#header .login").css('opacity', '0.5');
@@ -79,4 +70,10 @@ $(document).bind("logout", function(event) {
   window.location.href = "/";
 },false);
 
-setSessions();
+$(document).ready(function() {
+  $.get('/api/whoami', function (res) {
+    console.log(res);
+    if (res === null) loggedOut();
+    else loggedIn(res);
+  }, 'json');
+});
