@@ -1,10 +1,3 @@
-// IE needs this to be able to style HTML5 elements properly
-var els = ['header'|'footer'|'small'];
-for(var type, i = 0; type=els[i]; ++i) {
-  document.createElement(els);
-}
-
-
 function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
