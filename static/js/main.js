@@ -94,12 +94,15 @@ function gotVerifiedEmail(assertion) {
   });
 }
 
-$(document).bind("login", function(event) {
-  $("header .login").css('opacity', '0.5');
-  navigator.id.getVerifiedEmail(gotVerifiedEmail);
-},false);
+// For some reason, login/logout do not respond when bound using jQuery
+if(document.addEventListener) {
+  document.addEventListener("login", function(event) {
+    $("header .login").css('opacity', '0.5');
+    navigator.id.getVerifiedEmail(gotVerifiedEmail);
+  }, false);
 
-$(document).bind("logout", logout);
+  document.addEventListener("logout", logout, false);
+}
 
 $(function() {
   $.get('/api/whoami', function (res) {
