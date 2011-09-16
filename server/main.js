@@ -79,15 +79,18 @@ app.post("/api/login", function (req, res) {
     var body = "";
     vres.on('data', function(chunk) { body+=chunk; } )
         .on('end', function() {
-          console.log(body);
+          try {
+            var verifierResp = JSON.parse(body);
+            var valid = verifierResp && verifierResp.status === "okay";
+            var email = valid ? verifierResp.email : null;
 
-          var verifierResp = JSON.parse(body);
-          var valid = verifierResp && verifierResp.status === "okay";
-          var email = valid ? verifierResp.email : null;
-
-          req.session.email = email;
-
-          res.json(email);
+            req.session.email = email;
+            
+            res.json(email);
+          } catch(e) {
+            // bogus response from verifier!  return null
+            res.json(null);
+          }
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
