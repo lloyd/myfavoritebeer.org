@@ -109,7 +109,7 @@ app.get("/api/set", function (req, res) {
 // serve static resources
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
-app.listen(process.env.PORT || 0, '127.0.0.1', function () {
+app.listen(process.env.PORT || 0, process.env.IP || '127.0.0.1', function () {
   var address = app.address();
   fullServerAddress = address.address + ':' + address.port;
   console.log("listening on " + fullServerAddress);
