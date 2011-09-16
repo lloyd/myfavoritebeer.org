@@ -12,6 +12,18 @@ querystring = require('querystring');
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
+// BrowserID
+const BROWSERID_URL = process.env.BROWSERID_URL ? process.env.BROWSERID_URL: 'https://browserid.org';
+
+// The verifier
+const VERIFIER_HOST = BROWSERID_URL.replace(/http(s?):\/\//, '');
+
+// The IP Address to listen on.
+const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
+
+// The port to listen to.
+const PORT = process.env.PORT || 0;
+
 // fullServerAddress is set once the server is started - contains hostname:port
 var fullServerAddress;
 var app = express.createServer();
@@ -44,9 +56,9 @@ app.use(function (req, res, next) {
 
 // a substitution middleware allows us to easily point at different browserid servers
 if (process.env.BROWSERID_URL) {
-  console.log("Using BrowserID at: " + process.env.BROWSERID_URL);
+  console.log("Using BrowserID at: " + BROWSERID_URL);
   app.use(postprocess.middleware(function(body) {
-    return body.toString().replace(new RegExp("https://browserid.org", 'g'), process.env.BROWSERID_URL);
+    return body.toString().replace(new RegExp("https://browserid.org", 'g'), BROWSERID_URL);
   }));
 }
 
@@ -57,13 +69,10 @@ app.get("/api/whoami", function (req, res) {
 });
 
 app.post("/api/login", function (req, res) {
-  // Verification needs to occur against what we are saying is BrowserID.
-  var verifyWith = process.env.BROWSERID_URL ? process.env.BROWSERID_URL.replace(/http(s?):\/\//, '') : "browserid.org";
-
   // req.body.assertion contains an assertion we should
   // verify, we'll use the browserid verification console
   var vreq = https.request({
-    host: verifyWith,
+    host: VERIFIER_HOST,
     path: "/verify",
     method: 'POST'
   }, function(vres) {
@@ -109,7 +118,7 @@ app.get("/api/set", function (req, res) {
 // serve static resources
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
-app.listen(process.env.PORT || 0, process.env.IP || '127.0.0.1', function () {
+app.listen(PORT, IP_ADDRESS, function () {
   var address = app.address();
   fullServerAddress = address.address + ':' + address.port;
   console.log("listening on " + fullServerAddress);

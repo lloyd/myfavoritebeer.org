@@ -1,9 +1,6 @@
-// IE needs this to be able to style HTML5 elements properly
-var els = ['header'|'footer'|'small'];
-for(var type, i = 0; type=els[i]; ++i) {
-  document.createElement(els);
-}
-
+// Add these in for IE that does not have dev tools open
+window.console = window.console || {};
+console.log = console.log || function() {};
 
 function setSessions(val) {
   if (navigator.id) {
@@ -11,7 +8,7 @@ function setSessions(val) {
   }
 } 
 
-function loggedIn(email) {
+function loggedIn(email, immediate) {
   setSessions([ { email: email } ]);
 
   // set the user visible display
@@ -26,10 +23,16 @@ function loggedIn(email) {
   
   $("#logout").bind('click', logout);
 
-  $("#content .intro").fadeOut(700, function() {
-    $("#content .business").fadeIn(300, function() {
+  if (immediate) {
+    $("#content .intro").hide();
+    $("#content .business").fadeIn(300);
+  }
+  else {
+    $("#content .intro").fadeOut(700, function() {
+      $("#content .business").fadeIn(300);
     });
-  });
+  }
+
 
   // enter causes us to save the value and do a little animation
   $('input').keypress(function(e){
@@ -63,6 +66,7 @@ function logout(event) {
 
 function loggedOut() {
   setSessions();
+  $('.intro').fadeIn(300);
   var l = $("header .login").removeClass('clickable');
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
@@ -87,16 +91,19 @@ function gotVerifiedEmail(assertion) {
   });
 }
 
-$(document).bind("login", function(event) {
-  $("header .login").css('opacity', '0.5');
-  navigator.id.getVerifiedEmail(gotVerifiedEmail);
-},false);
+// For some reason, login/logout do not respond when bound using jQuery
+if(document.addEventListener) {
+  document.addEventListener("login", function(event) {
+    $("header .login").css('opacity', '0.5');
+    navigator.id.getVerifiedEmail(gotVerifiedEmail);
+  }, false);
 
-$(document).bind("logout", logout);
+  document.addEventListener("logout", logout, false);
+}
 
 $(function() {
   $.get('/api/whoami', function (res) {
     if (res === null) loggedOut();
-    else loggedIn(res);
+    else loggedIn(res, true);
   }, 'json');
 });
