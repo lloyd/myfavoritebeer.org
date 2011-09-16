@@ -83,11 +83,11 @@ app.post("/api/login", function (req, res) {
             var verifierResp = JSON.parse(body);
             var valid = verifierResp && verifierResp.status === "okay";
             var email = valid ? verifierResp.email : null;
-
             req.session.email = email;
-            
+            console.log("assertion verified successfully for email: " + email);
             res.json(email);
           } catch(e) {
+            console.log("bad response from verifier");
             // bogus response from verifier!  return null
             res.json(null);
           }
@@ -101,6 +101,7 @@ app.post("/api/login", function (req, res) {
   vreq.setHeader('Content-Length', data.length);
   vreq.write(data);
   vreq.end();
+  console.log("verifying assertion!");
 });
 
 app.post("/api/logout", function (req, res) {
