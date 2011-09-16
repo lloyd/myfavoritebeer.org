@@ -64,7 +64,6 @@ function logout(event) {
 function loggedOut() {
   setSessions();
   var l = $("header .login").removeClass('clickable');
-  console.log("creating login button");
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
       $("header .login").css('opacity', '0.5');
@@ -74,18 +73,16 @@ function loggedOut() {
 
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
-  console.log("send ass", assertion);
   $.ajax({
     type: 'POST',
     url: '/api/login',
     data: { assertion: assertion },
     success: function(res, status, xhr) {
-      console.log("got res", res);
       if (res === null) loggedOut();
       else loggedIn(res);
     },
     error: function(res, status, xhr) {
-      console.log("login failure" + res);
+      alert("login failure" + res);
     }
   });
 }
@@ -99,7 +96,6 @@ $(document).bind("logout", logout);
 
 $(function() {
   $.get('/api/whoami', function (res) {
-    console.log(res);
     if (res === null) loggedOut();
     else loggedIn(res);
   }, 'json');
