@@ -12,12 +12,6 @@ querystring = require('querystring');
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
-// BrowserID
-const BROWSERID_URL = process.env.BROWSERID_URL ? process.env.BROWSERID_URL: 'https://browserid.org';
-
-// The verifier
-const VERIFIER_HOST = BROWSERID_URL.replace(/http(s?):\/\//, '');
-
 // The IP Address to listen on.
 const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
 
@@ -56,13 +50,39 @@ app.use(function (req, res, next) {
   return next();
 });
 
-// a substitution middleware allows us to easily point at different browserid servers
-if (process.env.BROWSERID_URL) {
-  console.log("Using BrowserID at: " + BROWSERID_URL);
-  app.use(postprocess.middleware(function(body) {
-    return body.toString().replace(new RegExp("https://browserid.org", 'g'), BROWSERID_URL);
-  }));
+// some fancy logic to make it so we can run multiple different
+// versions of myfavoritebeer on the same server, each which uses
+// a different browserid server (dev/beta/prod):
+function determineBrowserIDURL(req) {
+  // first defer to the environment
+  if (process.env.BROWSERID_URL) return process.env.BROWSERID_URL;
+
+  var browseridURL = 'https://browserid.org'; 
+
+  // if you're contacting beta.myfavoritebeer.org, then we'll use the
+  // beta browserid server
+  if (/^beta/.test(req.headers['host'])) {
+    browseridURL = 'https://diresworb.org';
+  }
+  // if you're contacting dev.myfavoritebeer.org, then we'll use the
+  // dev browserid server
+  else if (/^dev/.test(req.headers['host'])) {
+    browseridURL = 'https://dev.diresworb.org';
+  }
+
+  return browseridURL;
 }
+
+function determineBrowserIDHost(req) {
+  return determineBrowserIDURL(req).replace(/http(s?):\/\//, '');
+}
+
+// a substitution middleware allows us to easily point at different browserid servers
+app.use(postprocess.middleware(function(req, body) {
+  var browseridURL = determineBrowserIDURL(req);
+  return body.toString().replace(new RegExp("https://browserid.org", 'g'), browseridURL);
+}));
+
 
 // and now for the wsapi api
 app.get("/api/whoami", function (req, res) {
@@ -74,7 +94,7 @@ app.post("/api/login", function (req, res) {
   // req.body.assertion contains an assertion we should
   // verify, we'll use the browserid verification console
   var vreq = https.request({
-    host: VERIFIER_HOST,
+    host: determineBrowserIDHost(req),
     path: "/verify",
     method: 'POST'
   }, function(vres) {
@@ -86,10 +106,14 @@ app.post("/api/login", function (req, res) {
             var valid = verifierResp && verifierResp.status === "okay";
             var email = valid ? verifierResp.email : null;
             req.session.email = email;
-            console.log("assertion verified successfully for email: " + email);
+            if (valid) {
+              console.log("assertion verified successfully for email:", email);
+            } else {
+              console.log("failed to verify assertion:", verifierResp.reason);
+            }                
             res.json(email);
           } catch(e) {
-            console.log("bad response from verifier");
+            console.log("non-JSON response from verifier");
             // bogus response from verifier!  return null
             res.json(null);
           }
@@ -99,7 +123,6 @@ app.post("/api/login", function (req, res) {
   // the *audience* depends on how the client reaches us.  We'll just
   // use the hostname out of the request
   var audience = req.headers['host'] ? req.headers['host'] : localHostname;   
-
   var data = querystring.stringify({
     assertion: req.body.assertion,
     audience: audience
