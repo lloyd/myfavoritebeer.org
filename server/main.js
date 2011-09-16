@@ -24,8 +24,10 @@ const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
 // The port to listen to.
 const PORT = process.env.PORT || 0;
 
-// fullServerAddress is set once the server is started - contains hostname:port
-var fullServerAddress;
+// localHostname is the address to which we bind.  It will be used
+// as our external address ('audience' to which assertions will be set)
+// if no 'Host' header is present on incoming login requests.
+var localHostname = undefined;
 var app = express.createServer();
 
 // do some logging
@@ -94,9 +96,13 @@ app.post("/api/login", function (req, res) {
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+  // the *audience* depends on how the client reaches us.  We'll just
+  // use the hostname out of the request
+  var audience = req.headers['host'] ? req.headers['host'] : localHostname;   
+
   var data = querystring.stringify({
     assertion: req.body.assertion,
-    audience: fullServerAddress
+    audience: audience
   });
   vreq.setHeader('Content-Length', data.length);
   vreq.write(data);
@@ -124,6 +130,6 @@ app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
 app.listen(PORT, IP_ADDRESS, function () {
   var address = app.address();
-  fullServerAddress = address.address + ':' + address.port;
-  console.log("listening on " + fullServerAddress);
+  localHostname = address.address + ':' + address.port
+  console.log("listening on " + localHostname);
 });
