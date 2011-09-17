@@ -17,8 +17,10 @@ var collections = {
 
 exports.connect = function(cb) {
   if (!process.env.MONGOLAB_URI) {
-    throw "no MONGOLAB_URI env var!  persistence is missing!  I give up!";
+    cb("no MONGOLAB_URI env var!");
+    return;
   }
+
   var bits = url.parse(process.env.MONGOLAB_URI);
   var server = new mongodb.Server(bits.hostname, bits.port, {});
   new mongodb.Db(bits.pathname.substr(1), server, {}).open(function (err, cli) {

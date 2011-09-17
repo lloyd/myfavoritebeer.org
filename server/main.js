@@ -28,6 +28,9 @@ var localHostname = undefined;
 // create a webserver using the express framework
 var app = express.createServer();
 
+// a global flag indicating whether we have persistence or not.
+var havePersistence;
+
 // do some logging
 app.use(express.logger({ format: 'dev' }));
 
@@ -169,6 +172,11 @@ app.get("/api/get", function (req, res) {
     return;
   }
 
+  if (!havePersistence) {
+    console.log("WARNING: get is a no-op!  we have no database configured");
+    return res.json("no database");
+  }
+
   db.get(determineEnvironment(req), email, function(err, beer) {
     if (err) {
       console.log("error getting beer for", email); 
@@ -201,6 +209,11 @@ app.post("/api/set", function (req, res) {
     return;
   }
 
+  if (!havePersistence) {
+    console.log("WARNING: set is a no-op!  we have no database configured");
+    return res.json(true);
+  }
+
   db.set(determineEnvironment(req), email, beer, function(err) {
     if (err) {
       console.log("setting beer for", email, "to", beer); 
@@ -217,10 +230,9 @@ app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
 // connect up the database!
 db.connect(function(err) {
-  if (err) {
-    console.log("failed to connect to db:", err);
-    process.exit(1);
-  }
+  havePersistence = (err ? false : true);
+
+  if (err) console.log("WARNING: running without a database means no persistence: ", err);
 
   // once connected to the database, start listening for connections
   app.listen(PORT, IP_ADDRESS, function () {
