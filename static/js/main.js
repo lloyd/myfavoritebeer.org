@@ -81,6 +81,7 @@ function logout(event) {
 // which will call into browserid when clicked.
 function loggedOut() {
   setSessions();
+  $("#content .business").hide();
   $('.intro').fadeIn(300);
   $("header .picture").empty();
   var l = $("header .login").removeClass('clickable');
