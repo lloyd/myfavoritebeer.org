@@ -17,6 +17,7 @@ exports.connect = function(cb) {
   new mongodb.Db(bits.pathname.substr(1), server, {}).open(function (err, cli) {
     if (err) return cb(err);
     collections.dev = new mongodb.Collection(cli, 'devbeers');
+    collections.local = collections.dev;
     collections.beta = new mongodb.Collection(cli, 'betabeers');
     collections.prod = new mongodb.Collection(cli, 'prodbeers');
 

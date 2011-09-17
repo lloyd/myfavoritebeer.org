@@ -8,7 +8,8 @@ path = require('path'),
 postprocess = require('postprocess'),
 https = require('https'),
 querystring = require('querystring'),
-db = require('./db.js');
+db = require('./db.js'),
+url = require('url');
 
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
@@ -46,10 +47,18 @@ var cookieSession = sessions({
     secure: false
   }
 });
+
 app.use(function (req, res, next) {
   if (/^\/api/.test(req.url)) return cookieSession(req, res, next);
   return next();
 });
+
+function determineEnvironment(req) {
+  if (req.headers['host'] === 'myfavoritebeer.org') return 'prod';
+  else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
+  else if (req.headers['host'] === 'dev.myfavoritebeer.org') return 'dev';
+  else return 'local';
+}
 
 // some fancy logic to make it so we can run multiple different
 // versions of myfavoritebeer on the same server, each which uses
@@ -58,20 +67,12 @@ function determineBrowserIDURL(req) {
   // first defer to the environment
   if (process.env.BROWSERID_URL) return process.env.BROWSERID_URL;
 
-  var browseridURL = 'https://browserid.org'; 
-
-  // if you're contacting beta.myfavoritebeer.org, then we'll use the
-  // beta browserid server
-  if (/^beta/.test(req.headers['host'])) {
-    browseridURL = 'https://diresworb.org';
-  }
-  // if you're contacting dev.myfavoritebeer.org, then we'll use the
-  // dev browserid server
-  else if (/^dev/.test(req.headers['host'])) {
-    browseridURL = 'https://dev.diresworb.org';
-  }
-
-  return browseridURL;
+  return ({
+    prod:   'https://browserid.org',
+    beta:   'https://diresworb.org',
+    dev:    'https://dev.diresworb.org',
+    local:  'https://dev.diresworb.org'
+  })[determineEnvironment(req)];
 }
 
 function determineBrowserIDHost(req) {
@@ -140,13 +141,55 @@ app.post("/api/logout", function (req, res) {
 });
 
 app.get("/api/get", function (req, res) {
-  console.log("you want to get your favorite beer, eh?");
-  res.json(false);
+  var email;
+  if (req.session && typeof req.session.email === 'string') email = req.session.email;
+
+  if (!email) {
+    resp.writeHead(400, {"Content-Type": "text/plain"});
+    resp.write("Bad Request: you must be authenticated to get your beer");
+    resp.end();
+    return;
+  }
+
+  db.get(determineEnvironment(req), email, function(err, beer) {
+    if (err) {
+      console.log("error getting beer for", email); 
+      res.writeHead(500);
+      res.end();
+    } else {
+      res.json(beer);
+    }
+  });
 });
 
-app.get("/api/set", function (req, res) {
-  console.log("you want to set your favorite beer, eh?");
-  res.json(false);
+app.post("/api/set", function (req, res) {
+  var email = req.session.email;
+
+  if (!email) {
+    resp.writeHead(400, {"Content-Type": "text/plain"});
+    resp.write("Bad Request: you must be authenticated to get your beer");
+    resp.end();
+    return;
+  }
+
+  var beer = req.body.beer;
+
+  if (!beer) {
+    resp.writeHead(400, {"Content-Type": "text/plain"});
+    resp.write("Bad Request: a 'beer' parameter is required to set your favorite beer");
+    resp.end();
+    return;
+  }
+
+  db.set(determineEnvironment(req), email, beer, function(err) {
+    if (err) {
+      console.log("setting beer for", email, "to", beer); 
+      res.writeHead(500);
+      res.end();
+    } else {
+      res.json(true);
+    }
+  });
 });
 
 // serve static resources

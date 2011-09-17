@@ -33,17 +33,30 @@ function loggedIn(email, immediate) {
     });
   }
 
-
   // enter causes us to save the value and do a little animation
   $('input').keypress(function(e){
     if(e.which == 13) {
-      window.localStorage.setItem(email, $("input").val());
+      $.ajax({
+        type: 'POST',
+        url: '/api/set',
+        data: { beer: $("input").val() },
+        success: function(res, status, xhr) {
+          console.log("successfully set beer:", res);
+        }
+      });
       $("#content input").fadeOut(200).fadeIn(400);
       e.preventDefault();
     }
   });
 
-  $("input").val(window.localStorage.getItem(email));
+  $.ajax({
+    type: 'GET',
+    url: '/api/get',
+    success: function(res, status, xhr) {
+      console.log("successfully got beer:", res);
+      $("input").val(res);
+    }
+  });
 
   // get a gravatar cause it's pretty
   var iurl = 'http://www.gravatar.com/avatar/' +
