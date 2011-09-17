@@ -92,7 +92,7 @@ function gotVerifiedEmail(assertion) {
 }
 
 // For some reason, login/logout do not respond when bound using jQuery
-if(document.addEventListener) {
+if (document.addEventListener) {
   document.addEventListener("login", function(event) {
     $("header .login").css('opacity', '0.5');
     navigator.id.getVerifiedEmail(gotVerifiedEmail);
