@@ -1,3 +1,10 @@
+// db.js is a tiny persistence layer for myfavoritebeer that uses
+// mongodb and the mongodb client library.
+//
+// This implementation is really not the point of the myfavoritebeer
+// example code and is just provided for completeness (the point is
+// how you can do authentication with browserid).  
+
 const
 url = require('url'),
 mongodb = require('mongodb');

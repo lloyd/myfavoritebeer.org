@@ -24,6 +24,8 @@ const PORT = process.env.PORT || 0;
 // as our external address ('audience' to which assertions will be set)
 // if no 'Host' header is present on incoming login requests.
 var localHostname = undefined;
+
+// create a webserver using the express framework
 var app = express.createServer();
 
 // do some logging
@@ -53,6 +55,10 @@ app.use(function (req, res, next) {
   return next();
 });
 
+// The next three functions contain some fancy logic to make it so
+// we can run multiple different versions of myfavoritebeer on the
+// same server, each which uses a different browserid server
+// (dev/beta/prod):
 function determineEnvironment(req) {
   if (req.headers['host'] === 'myfavoritebeer.org') return 'prod';
   else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
@@ -60,9 +66,6 @@ function determineEnvironment(req) {
   else return 'local';
 }
 
-// some fancy logic to make it so we can run multiple different
-// versions of myfavoritebeer on the same server, each which uses
-// a different browserid server (dev/beta/prod):
 function determineBrowserIDURL(req) {
   // first defer to the environment
   if (process.env.BROWSERID_URL) return process.env.BROWSERID_URL;
@@ -86,15 +89,24 @@ app.use(postprocess.middleware(function(req, body) {
 }));
 
 
-// and now for the wsapi api
+// /api/whoami is an API that returns the authentication status of the current session.
+// it returns a JSON encoded string containing the currently authenticated user's email
+// if someone is logged in, otherwise it returns null.
 app.get("/api/whoami", function (req, res) {
   if (req.session && typeof req.session.email === 'string') return res.json(req.session.email);
   return res.json(null);
 });
 
+
+// /api/login is an API which authenticates the current session.  The client includes 
+// an assertion in the post body (returned by browserid's navigator.id.getVerifiedEmail()).
+// if the assertion is valid an (encrypted) cookie is set to start the user's session.
+// returns a json encoded email if the session is successfully authenticated, otherwise
+// null.
 app.post("/api/login", function (req, res) {
-  // req.body.assertion contains an assertion we should
-  // verify, we'll use the browserid verification console
+  // To verify the assertion we initiate a POST request to the browserid verifier service.
+  // If we didn't want to rely on this service, it's possible to implement verification
+  // in a library and to do it ourselves.  
   var vreq = https.request({
     host: determineBrowserIDHost(req),
     path: "/verify",
@@ -122,8 +134,10 @@ app.post("/api/login", function (req, res) {
         });
   });
   vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-  // the *audience* depends on how the client reaches us.  We'll just
-  // use the hostname out of the request
+
+  // An "audience" argument is embedded in the assertion and must match our hostname.
+  // Because this one server runs on multiple different domain names we just use
+  // the host parameter out of the request.
   var audience = req.headers['host'] ? req.headers['host'] : localHostname;   
   var data = querystring.stringify({
     assertion: req.body.assertion,
@@ -135,13 +149,17 @@ app.post("/api/login", function (req, res) {
   console.log("verifying assertion!");
 });
 
+// /api/logout clears the session cookie, effectively terminating the current session.
 app.post("/api/logout", function (req, res) {
   req.session.email = null;
   res.json(true);
 });
 
+// /api/get requires an authenticated session, and accesses the current user's favorite
+// beer out of the database.
 app.get("/api/get", function (req, res) {
   var email;
+
   if (req.session && typeof req.session.email === 'string') email = req.session.email;
 
   if (!email) {
@@ -162,6 +180,8 @@ app.get("/api/get", function (req, res) {
   });
 });
 
+// /api/set requires an authenticated session, and sets the current user's favorite
+// beer in the database.
 app.post("/api/set", function (req, res) {
   var email = req.session.email;
 
@@ -192,7 +212,7 @@ app.post("/api/set", function (req, res) {
   });
 });
 
-// serve static resources
+// Tell express from where it should serve static resources
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
 // connect up the database!
@@ -202,7 +222,7 @@ db.connect(function(err) {
     process.exit(1);
   }
 
-  // start listening for connections
+  // once connected to the database, start listening for connections
   app.listen(PORT, IP_ADDRESS, function () {
     var address = app.address();
     localHostname = address.address + ':' + address.port

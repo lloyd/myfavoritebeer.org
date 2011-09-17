@@ -1,13 +1,12 @@
-// Add these in for IE that does not have dev tools open
-window.console = window.console || {};
-console.log = console.log || function() {};
-
 function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
   }
 } 
 
+// when the user is found to be logged in we'll update the UI, fetch and
+// display the user's favorite beer from the server, and set up handlers to
+// wait for user input (specifying their favorite beer).
 function loggedIn(email, immediate) {
   setSessions([ { email: email } ]);
 
@@ -41,7 +40,7 @@ function loggedIn(email, immediate) {
         url: '/api/set',
         data: { beer: $("input").val() },
         success: function(res, status, xhr) {
-          console.log("successfully set beer:", res);
+          // noop
         }
       });
       $("#content input").fadeOut(200).fadeIn(400);
@@ -53,7 +52,6 @@ function loggedIn(email, immediate) {
     type: 'GET',
     url: '/api/get',
     success: function(res, status, xhr) {
-      console.log("successfully got beer:", res);
       $("input").val(res);
     }
   });
@@ -65,21 +63,26 @@ function loggedIn(email, immediate) {
   $("<img>").attr('src', iurl).appendTo($("header .picture"));
 }
 
+// when the user clicks logout, we'll make a call to the server to clear
+// our current session.
 function logout(event) {
   event.preventDefault();
   $.ajax({
     type: 'POST',
     url: '/api/logout',
     success: function() {
-      document.location = '/';
+      // and then redraw the UI.
+      loggedOut();
     }
   });
 }
 
-
+// when no user is logged in, we'll display a "sign-in" button
+// which will call into browserid when clicked.
 function loggedOut() {
   setSessions();
   $('.intro').fadeIn(300);
+  $("header .picture").empty();
   var l = $("header .login").removeClass('clickable');
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
@@ -88,6 +91,8 @@ function loggedOut() {
     }).addClass("clickable");
 }
 
+// a handler that is passed an assertion after the user logs in via the
+// browserid dialog
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
   $.ajax({
@@ -114,6 +119,8 @@ if (document.addEventListener) {
   document.addEventListener("logout", logout, false);
 }
 
+// at startup let's check to see whether we're authenticated to
+// myfavoritebeer (have existing cookie), and update the UI accordingly
 $(function() {
   $.get('/api/whoami', function (res) {
     if (res === null) loggedOut();
