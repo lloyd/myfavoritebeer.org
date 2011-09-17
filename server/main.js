@@ -7,7 +7,8 @@ sessions = require('connect-cookie-session'),
 path = require('path'),
 postprocess = require('postprocess'),
 https = require('https'),
-querystring = require('querystring');
+querystring = require('querystring'),
+db = require('./db.js');
 
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
@@ -151,8 +152,17 @@ app.get("/api/set", function (req, res) {
 // serve static resources
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
 
-app.listen(PORT, IP_ADDRESS, function () {
-  var address = app.address();
-  localHostname = address.address + ':' + address.port
-  console.log("listening on " + localHostname);
+// connect up the database!
+db.connect(function(err) {
+  if (err) {
+    console.log("failed to connect to db:", err);
+    process.exit(1);
+  }
+
+  // start listening for connections
+  app.listen(PORT, IP_ADDRESS, function () {
+    var address = app.address();
+    localHostname = address.address + ':' + address.port
+    console.log("listening on " + localHostname);
+  });
 });
