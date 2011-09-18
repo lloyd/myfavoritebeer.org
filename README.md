@@ -16,15 +16,17 @@ browserid as fast as possible.
   [how browserid works]: http://lloyd.io/how-browserid-works
   [three step tutorial]: https://github.com/mozilla/browserid/wiki/How-to-Use-BrowserID-on-Your-Site
 
-This repository goes into greater depth and provides a full working example of 
-a small but complete website that uses BrowserID for authentication.  This
-code is running at [myfavoritebeer.org](http://myfavoritebeer.org).
+This repository goes into greater depth than the tutorial, and
+provides a full working example of a small but complete website that
+uses BrowserID for authentication.  This code is running at
+[myfavoritebeer.org](http://myfavoritebeer.org).
 
 ## The Implementation
 
 MyFavoriteBeer is a simple site that allows a user to log in and store a single string
-of information, their favorite beer.  The site consists of a static HTML frontend, and
-a simple web services API implemented by a node.js server.
+of information, their favorite beer.  The site consists of a static HTML frontend
+(code under `static/`), and
+a simple web services API implemented by a node.js server (code under `server/`).
 
 ### The API
 
@@ -52,9 +54,9 @@ verification, the server sets a cookie which represents an authenticated session
 
 For simplicities' sake, "sessions" in this example are implemented using a
 [third party library](https://github.com/jpallen/connect-cookie-session) which encrypts
-session data using a private key and stores this data on the client.  This approach 
-makes it so the server doesn't need to store any data to implement sessions and 
-keeps the example simple.
+session data using a private key and stores this data in a cookie on the user's browser.
+This approach makes it so the server doesn't need to store any data to implement sessions
+and keeps the example simple.
 
 ### Persistence
 
