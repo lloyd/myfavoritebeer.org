@@ -166,9 +166,9 @@ app.get("/api/get", function (req, res) {
   if (req.session && typeof req.session.email === 'string') email = req.session.email;
 
   if (!email) {
-    resp.writeHead(400, {"Content-Type": "text/plain"});
-    resp.write("Bad Request: you must be authenticated to get your beer");
-    resp.end();
+    res.writeHead(400, {"Content-Type": "text/plain"});
+    res.write("Bad Request: you must be authenticated to get your beer");
+    res.end();
     return;
   }
 
