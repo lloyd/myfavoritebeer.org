@@ -96,18 +96,23 @@ function loggedOut() {
 // browserid dialog
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
-  $.ajax({
-    type: 'POST',
-    url: '/api/login',
-    data: { assertion: assertion },
-    success: function(res, status, xhr) {
-      if (res === null) loggedOut();
-      else loggedIn(res);
-    },
-    error: function(res, status, xhr) {
-      alert("login failure" + res);
-    }
-  });
+  if (assertion !== null) {
+    $.ajax({
+      type: 'POST',
+      url: '/api/login',
+      data: { assertion: assertion },
+      success: function(res, status, xhr) {
+        if (res === null) loggedOut();
+        else loggedIn(res);
+      },
+      error: function(res, status, xhr) {
+        alert("login failure" + res);
+      }
+    });
+  }
+  else {
+    loggedOut();
+  }
 }
 
 // For some reason, login/logout do not respond when bound using jQuery
