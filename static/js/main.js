@@ -89,7 +89,7 @@ function loggedOut() {
     .show().click(function() {
       $("header .login").css('opacity', '0.5');
       navigator.id.getVerifiedEmail(gotVerifiedEmail);
-    }).addClass("clickable");
+    }).addClass("clickable").css('opacity','1.0');
 }
 
 // a handler that is passed an assertion after the user logs in via the
