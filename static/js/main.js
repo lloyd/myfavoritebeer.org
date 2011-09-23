@@ -1,13 +1,12 @@
-// Add these in for IE that does not have dev tools open
-window.console = window.console || {};
-console.log = console.log || function() {};
-
 function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
   }
 } 
 
+// when the user is found to be logged in we'll update the UI, fetch and
+// display the user's favorite beer from the server, and set up handlers to
+// wait for user input (specifying their favorite beer).
 function loggedIn(email, immediate) {
   setSessions([ { email: email } ]);
 
@@ -33,17 +32,29 @@ function loggedIn(email, immediate) {
     });
   }
 
-
   // enter causes us to save the value and do a little animation
   $('input').keypress(function(e){
     if(e.which == 13) {
-      window.localStorage.setItem(email, $("input").val());
+      $.ajax({
+        type: 'POST',
+        url: '/api/set',
+        data: { beer: $("input").val() },
+        success: function(res, status, xhr) {
+          // noop
+        }
+      });
       $("#content input").fadeOut(200).fadeIn(400);
       e.preventDefault();
     }
   });
 
-  $("input").val(window.localStorage.getItem(email));
+  $.ajax({
+    type: 'GET',
+    url: '/api/get',
+    success: function(res, status, xhr) {
+      $("input").val(res);
+    }
+  });
 
   // get a gravatar cause it's pretty
   var iurl = 'http://www.gravatar.com/avatar/' +
@@ -52,23 +63,28 @@ function loggedIn(email, immediate) {
   $("<img>").attr('src', iurl).appendTo($("header .picture"));
 }
 
+// when the user clicks logout, we'll make a call to the server to clear
+// our current session.
 function logout(event) {
   event.preventDefault();
   $.ajax({
     type: 'POST',
     url: '/api/logout',
     success: function() {
-      document.location = '/';
+      // and then redraw the UI.
+      loggedOut();
     }
   });
 }
 
-
+// when no user is logged in, we'll display a "sign-in" button
+// which will call into browserid when clicked.
 function loggedOut() {
   setSessions();
+  $("#content .business").hide();
   $('.intro').fadeIn(300);
+  $("header .picture").empty();
   var l = $("header .login").removeClass('clickable');
-  console.log("creating login button");
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
       $("header .login").css('opacity', '0.5');
@@ -76,26 +92,26 @@ function loggedOut() {
     }).addClass("clickable");
 }
 
+// a handler that is passed an assertion after the user logs in via the
+// browserid dialog
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
-  console.log("send ass", assertion);
   $.ajax({
     type: 'POST',
     url: '/api/login',
     data: { assertion: assertion },
     success: function(res, status, xhr) {
-      console.log("got res", res);
       if (res === null) loggedOut();
       else loggedIn(res);
     },
     error: function(res, status, xhr) {
-      console.log("login failure" + res);
+      alert("login failure" + res);
     }
   });
 }
 
 // For some reason, login/logout do not respond when bound using jQuery
-if(document.addEventListener) {
+if (document.addEventListener) {
   document.addEventListener("login", function(event) {
     $("header .login").css('opacity', '0.5');
     navigator.id.getVerifiedEmail(gotVerifiedEmail);
@@ -104,9 +120,10 @@ if(document.addEventListener) {
   document.addEventListener("logout", logout, false);
 }
 
+// at startup let's check to see whether we're authenticated to
+// myfavoritebeer (have existing cookie), and update the UI accordingly
 $(function() {
   $.get('/api/whoami', function (res) {
-    console.log(res);
     if (res === null) loggedOut();
     else loggedIn(res, true);
   }, 'json');
