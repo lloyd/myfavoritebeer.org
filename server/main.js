@@ -194,18 +194,18 @@ app.post("/api/set", function (req, res) {
   var email = req.session.email;
 
   if (!email) {
-    resp.writeHead(400, {"Content-Type": "text/plain"});
-    resp.write("Bad Request: you must be authenticated to get your beer");
-    resp.end();
+    res.writeHead(400, {"Content-Type": "text/plain"});
+    res.write("Bad Request: you must be authenticated to get your beer");
+    res.end();
     return;
   }
 
   var beer = req.body.beer;
 
   if (!beer) {
-    resp.writeHead(400, {"Content-Type": "text/plain"});
-    resp.write("Bad Request: a 'beer' parameter is required to set your favorite beer");
-    resp.end();
+    res.writeHead(400, {"Content-Type": "text/plain"});
+    res.write("Bad Request: a 'beer' parameter is required to set your favorite beer");
+    res.end();
     return;
   }
 
