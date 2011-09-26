@@ -40,22 +40,23 @@ app.use(express.cookieParser());
 // parse post bodies
 app.use(express.bodyParser());
 
-// session support using encrypted cookies
-var cookieSession = sessions({
-  secret: COOKIE_SECRET,
-  key: 'myfavoritebeer_session',
-  cookie: {
-    path: '/api',
-    httpOnly: true,
-    // when you're logged in, you're logged in for an hour
-    maxAge: (1 * 60 * 60 * 1000), 
-    secure: false
-  }
-});
-
+// session support using signed cookies
 app.use(function (req, res, next) {
-  if (/^\/api/.test(req.url)) return cookieSession(req, res, next);
-  return next();
+  if (/^\/api/.test(req.url)) {
+    return sessions({
+      secret: COOKIE_SECRET,
+      key: 'myfavoritebeer_session',
+      cookie: {
+        path: '/api',
+        httpOnly: true,
+        // when you're logged in, you're logged in for an hour
+        maxAge: (1 * 60 * 60 * 1000), 
+        secure: false
+      }
+    })(req, res, next);
+  } else {
+    return next();
+  }
 });
 
 // The next three functions contain some fancy logic to make it so
