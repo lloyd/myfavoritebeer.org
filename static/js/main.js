@@ -87,6 +87,7 @@ function logout(event) {
 // which will call into browserid when clicked.
 function loggedOut() {
   setSessions();
+  $("input").val("");
   $("#content .business").hide();
   $('.intro').fadeIn(300);
   $("header .picture").empty();
@@ -95,25 +96,30 @@ function loggedOut() {
     .show().click(function() {
       $("header .login").css('opacity', '0.5');
       navigator.id.getVerifiedEmail(gotVerifiedEmail);
-    }).addClass("clickable");
+    }).addClass("clickable").css('opacity','1.0');
 }
 
 // a handler that is passed an assertion after the user logs in via the
 // browserid dialog
 function gotVerifiedEmail(assertion) {
   // got an assertion, now send it up to the server for verification
-  $.ajax({
-    type: 'POST',
-    url: '/api/login',
-    data: { assertion: assertion },
-    success: function(res, status, xhr) {
-      if (res === null) loggedOut();
-      else loggedIn(res);
-    },
-    error: function(res, status, xhr) {
-      alert("login failure" + res);
-    }
-  });
+  if (assertion !== null) {
+    $.ajax({
+      type: 'POST',
+      url: '/api/login',
+      data: { assertion: assertion },
+      success: function(res, status, xhr) {
+        if (res === null) loggedOut();
+        else loggedIn(res);
+      },
+      error: function(res, status, xhr) {
+        alert("login failure" + res);
+      }
+    });
+  }
+  else {
+    loggedOut();
+  }
 }
 
 // For some reason, login/logout do not respond when bound using jQuery
