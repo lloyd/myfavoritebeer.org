@@ -35,18 +35,11 @@ function loggedIn(email, immediate) {
   // enter causes us to save the value and do a little animation
   $('input').keypress(function(e){
     if(e.which == 13) {
-      $.ajax({
-        type: 'POST',
-        url: '/api/set',
-        data: { beer: $("input").val() },
-        success: function(res, status, xhr) {
-          // noop
-        }
-      });
-      $("#content input").fadeOut(200).fadeIn(400);
-      e.preventDefault();
+      save(e);
     }
   });
+
+  $("#save").click(save);
 
   $.ajax({
     type: 'GET',
@@ -61,6 +54,19 @@ function loggedIn(email, immediate) {
     Crypto.MD5($.trim(email).toLowerCase()) +
     "?s=32";
   $("<img>").attr('src', iurl).appendTo($("header .picture"));
+}
+
+function save(event) {
+  event.preventDefault();
+  $.ajax({
+    type: 'POST',
+    url: '/api/set',
+    data: { beer: $("input").val() },
+    success: function(res, status, xhr) {
+      // noop
+    }
+  });
+  $("#content input").fadeOut(200).fadeIn(400);
 }
 
 // when the user clicks logout, we'll make a call to the server to clear
