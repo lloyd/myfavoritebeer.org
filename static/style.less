@@ -4,6 +4,25 @@ body {
     font-family: 'lucida grande', helvetica, arial, sans-serif;
 }
 
+/* for floats */
+.cf:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+
+html[xmlns] .cf {
+  display: block;
+}
+
+* html .cf {
+  height: 1%;
+}
+
+
 header {
     display: block;
     background-color: #143352;
@@ -31,12 +50,17 @@ header {
         float: left;
     }
 
-    .picture {
+    #loginInfo {
         float: right;
+        width: 250px;
+    }
+
+    .picture {
+        float: left;
         margin: 10px;
     }
     .login {
-        float: right;
+        float: left;
         margin-top: 10px;
         img {
             margin-top: 3px;
@@ -86,15 +110,21 @@ header {
         font-size: 1.4em;
     }
 
-    .business input {
-        background-color: transparent;
-        border: 1px solid #999;
-        font: 3em "Shadows Into Light";
-        padding: .4em;
-        width: 500px;
-        -moz-border-radius: 50px;
-        -webkit-border-radius: 50px;
-        border-radius: 50px;
+    .business {
+        #save {
+            display: none;
+        }
+
+        input {
+            background-color: transparent;
+            border: 1px solid #999;
+            font: 3em "Shadows Into Light";
+            padding: .4em;
+            width: 500px;
+            -moz-border-radius: 50px;
+            -webkit-border-radius: 50px;
+            border-radius: 50px;
+        }
     }
 }
 
@@ -134,5 +164,82 @@ footer {
         font-size: .8em;
         opacity: .8;
         margin-top: 1.5em;
+    }
+
+}
+
+@media screen and (max-device-width: 640px) {
+    header {
+        position: static;
+        height: auto;
+        text-align: center;
+
+        > div {
+            width: auto;
+        }
+
+        h1 {
+            float: none;
+            margin-top: 0;
+            padding-top: 0;
+            font-size: 2em;
+        }
+
+        #loginInfo {
+            float: none;
+            margin: 0 auto;
+        }
+
+    }
+
+    #content {
+        position: static;
+        padding: 10px 0;
+
+        .intro, .business {
+            width: auto;
+            font-size: 1.2em;
+        }
+
+        .business {
+            #save {
+                display: inline-block;
+                color: #333;
+                padding: 10px;
+                border: 1px solid #999;
+                border-radius: 10px;
+                background-color: #ccc;
+            }
+
+            #desktopSave {
+                display: none;
+            }
+
+            input {
+                -webkit-box-sizing: border-box;
+                   -moz-box-sizing: border-box;
+                     -o-box-sizing: border-box;
+                        box-sizing: border-box;
+                width: 95%;
+            }
+        }
+
+        p:first-child {
+            margin-top: 0;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    footer {
+        position: static;
+        height: auto;
+        > div {
+            margin-top: 0;
+            width: auto;
+            font-size: 0.7em;
+        }
     }
 }
