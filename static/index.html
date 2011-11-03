@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>My Favorite Beer, a BrowserID example</title>
+    <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -13,11 +14,13 @@
   </head>
   <body>
 
-    <header>
+    <header class="cf">
       <div>
         <h1 id="title">My Favorite Beer</h1>
-        <div class="picture"></div>
-        <div class="login"></div>
+        <div id="loginInfo">
+            <div class="picture"></div>
+            <div class="login"></div>
+          </div>
       </div>
     </header>
 
@@ -43,7 +46,8 @@
           <input type="text">
         </p>
         <p>
-          (click ^^ to modify, &lt;enter&gt; saves)
+          (click ^^ to modify<span id="desktopSave">, &lt;enter&gt; saves</span>)
+          <a href="#" id="save">Save</a>
         </p>
       </div>
     </div>
