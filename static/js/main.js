@@ -132,6 +132,15 @@ if (document.addEventListener) {
   document.addEventListener("logout", logout, false);
 }
 
+$('#installApp button').click(function() {
+  navigator.mozApps.install("/myfavoritebeer.webapp", "receipt goes here", 
+    function success() {
+      console.log('Install success');
+    }, function error() {
+      console.log('Install error');
+    });
+});
+
 // at startup let's check to see whether we're authenticated to
 // myfavoritebeer (have existing cookie), and update the UI accordingly
 $(function() {

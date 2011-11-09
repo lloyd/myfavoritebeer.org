@@ -2,6 +2,7 @@
 
 // require libraries that we depend on 
 const
+mime = require('mime'),
 express = require('express'),
 sessions = require('connect-cookie-session'),
 path = require('path'),
@@ -14,8 +15,9 @@ url = require('url');
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
-// The IP Address to listen on.
-const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
+// The IP Address to listen on. (undefined binds to localhost and any
+// other external/public IPs)
+const IP_ADDRESS = process.env.IP_ADDRESS || undefined;
 
 // The port to listen to.
 const PORT = process.env.PORT || 0;
@@ -228,6 +230,10 @@ app.post("/api/set", function (req, res) {
 
 // Tell express from where it should serve static resources
 app.use(express.static(path.join(path.dirname(__dirname), "static")));
+
+mime.define({
+  'application/x-web-app-manifest+json': ['webapp'] // .webapp format
+});
 
 // connect up the database!
 db.connect(function(err) {

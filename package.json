@@ -2,6 +2,7 @@
   "name": "myfavoritebeer",
   "version": "0.0.1",
   "dependencies": {
+    "mime": "1.2.4",
     "express": "2.4.6",
     "postprocess": "0.0.2",
     "connect-cookie-session" : "0.0.2",
