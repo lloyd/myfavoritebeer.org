@@ -13,15 +13,15 @@ function setSessions(val) {
 // when the user is found to be logged in we'll update the UI, fetch and
 // display the user's favorite beer from the server, and set up handlers to
 // wait for user input (specifying their favorite beer).
-function loggedIn(email, immediate) {
-  setSessions([ { email: email } ]);
+function loggedIn(user, immediate) {
+  setSessions([ { email: user.email } ]);
 
   // set the user visible display
   var l = $("header .login").removeClass('clickable');;
   l.empty();
   l.css('opacity', '1');
   l.append($("<span>").text("Yo, "))
-    .append($("<span>").text(email).addClass("username"))
+    .append($("<span>").text(user.email).addClass("username"))
     .append($("<span>!</span>"));
   l.append($('<div><a id="logout" href="#" >(logout)</a></div>'));
   l.unbind('click');
@@ -55,11 +55,8 @@ function loggedIn(email, immediate) {
     }
   });
 
-  // get a gravatar cause it's pretty
-  var iurl = 'http://www.gravatar.com/avatar/' +
-    Crypto.MD5($.trim(email).toLowerCase()) +
-    "?s=32";
-  $("<img>").attr('src', iurl).appendTo($("header .picture"));
+  // get an avatar cause it's pretty
+  $("<img>").attr('src', user.avatar).appendTo($("header .picture"));
 }
 
 function save(event) {

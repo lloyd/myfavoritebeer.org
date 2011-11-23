@@ -107,7 +107,7 @@ app.use(postprocess(function(req, body) {
 // it returns a JSON encoded string containing the currently authenticated user's email
 // if someone is logged in, otherwise it returns null.
 app.get("/api/whoami", function (req, res) {
-  if (req.session && typeof req.session.email === 'string') return res.json(req.session.email);
+  if (req.session && typeof req.session.email === 'string') return res.json({'email': req.session.email, 'avatar': 'http://cdn.libravatar.org/avatar/f52a1d3d8c39868fc92cf70828821635?s=32'});
   return res.json(null);
 });
 
@@ -139,7 +139,7 @@ app.post("/api/login", function (req, res) {
             } else {
               console.log("failed to verify assertion:", verifierResp.reason);
             }
-            res.json(email);
+            res.json({'email': email, 'avatar': 'http://cdn.libravatar.org/avatar/f52a1d3d8c39868fc92cf70828821635?s=32'});
           } catch(e) {
             console.log("non-JSON response from verifier");
             // bogus response from verifier!  return null
