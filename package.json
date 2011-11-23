@@ -5,6 +5,7 @@
     "express": "2.5.8",
     "postprocess": "0.2.4",
     "client-sessions" : "0.0.3",
+    "libravatar": "2.0.0",
     "mongodb": "0.9.6-16"
   },
   "scripts": {
