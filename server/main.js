@@ -40,9 +40,11 @@ app.use(express.cookieParser());
 // parse post bodies
 app.use(express.bodyParser());
 
-// session support using signed cookies
+// session support using signed cookies, also no caching of api requests
 app.use(function (req, res, next) {
   if (/^\/api/.test(req.url)) {
+    res.setHeader('Cache-Control', 'no-cache, max-age=0');
+
     return sessions({
       secret: COOKIE_SECRET,
       key: 'myfavoritebeer_session',
@@ -128,7 +130,7 @@ app.post("/api/login", function (req, res) {
               console.log("assertion verified successfully for email:", email);
             } else {
               console.log("failed to verify assertion:", verifierResp.reason);
-            }                
+            }
             res.json(email);
           } catch(e) {
             console.log("non-JSON response from verifier");
