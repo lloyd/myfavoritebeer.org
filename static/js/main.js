@@ -18,7 +18,6 @@ function loggedIn(email, immediate) {
     .append($("<span>").text(email).addClass("username"))
     .append($("<span>!</span>"));
   l.append($('<div><a id="logout" href="#" >(logout)</a></div>'));
-  l.unbind('click');
   
   $("#logout").bind('click', logout);
 
@@ -94,6 +93,7 @@ function loggedOut() {
   var l = $("header .login").removeClass('clickable');
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().click(function() {
+      l.unbind('click');
       $("header .login").css('opacity', '0.5');
       navigator.id.getVerifiedEmail(gotVerifiedEmail);
     }).addClass("clickable").css('opacity','1.0');
