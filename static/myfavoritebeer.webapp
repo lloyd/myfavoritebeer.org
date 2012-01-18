@@ -1,0 +1,14 @@
+{
+    "name": "MyFavoriteBeer.org",
+    "developer": {
+        "name": "Lloyd Hilaiel",
+        "url": "http://myfavoritebeer.org"
+    },
+    "icons": {
+        "128": "/i/icon-128.png"
+    },
+    "default_locale": "en",
+    "version": "1.0",
+    "description": "Remember your favorite beer, in the cloud",
+    "installs_allowed_from": ["*"]
+}
