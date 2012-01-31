@@ -69,19 +69,27 @@ function determineEnvironment(req) {
   if (req.headers['host'] === 'myfavoritebeer.org') return 'prod';
   else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
   else if (req.headers['host'] === 'dev.myfavoritebeer.org') return 'dev';
-  else return 'local';
+  else {
+    var m = /^(.*)\.myfavoritebeer\.org$/.exec(req.headers['host']);
+    if (m) return m[1];
+    else return 'local';
+  }
 }
+
+const staticEnvs = {
+  prod:   'https://browserid.org',
+  beta:   'https://diresworb.org',
+  dev:    'https://dev.diresworb.org',
+  local:  'https://dev.diresworb.org'
+};
 
 function determineBrowserIDURL(req) {
   // first defer to the environment
   if (process.env.BROWSERID_URL) return process.env.BROWSERID_URL;
 
-  return ({
-    prod:   'https://browserid.org',
-    beta:   'https://diresworb.org',
-    dev:    'https://dev.diresworb.org',
-    local:  'https://dev.diresworb.org'
-  })[determineEnvironment(req)];
+  var e = determineEnvironment(req);
+  if (staticEnvs[e]) return staticEnvs[e];
+  else return 'https://' + e + '.hacksign.in';
 }
 
 function determineBrowserIDHost(req) {
