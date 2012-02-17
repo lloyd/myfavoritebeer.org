@@ -2,7 +2,7 @@ function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
   }
-} 
+}
 
 // when the user is found to be logged in we'll update the UI, fetch and
 // display the user's favorite beer from the server, and set up handlers to
@@ -18,7 +18,8 @@ function loggedIn(email, immediate) {
     .append($("<span>").text(email).addClass("username"))
     .append($("<span>!</span>"));
   l.append($('<div><a id="logout" href="#" >(logout)</a></div>'));
-  
+  l.unbind('click');
+
   $("#logout").bind('click', logout);
 
   if (immediate) {
@@ -111,8 +112,8 @@ function gotVerifiedEmail(assertion) {
         if (res === null) loggedOut();
         else loggedIn(res);
       },
-      error: function(res, status, xhr) {
-        alert("login failure" + res);
+      error: function(xhr, status, error) {
+        alert("login failure " + error);
       }
     });
   }
