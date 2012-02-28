@@ -1,3 +1,9 @@
+var browseridArguments = {
+  // display our tos and privacy policy in the browserid dialog
+  privacyURL: '/privacy.html',
+  tosURL: '/privacy.html',
+};
+
 function setSessions(val) {
   if (navigator.id) {
     navigator.id.sessions = val ? val : [ ];
@@ -95,7 +101,7 @@ function loggedOut() {
   l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
     .show().one('click', function() {
       $("header .login").css('opacity', '0.5');
-      navigator.id.getVerifiedEmail(gotVerifiedEmail);
+      navigator.id.get(gotVerifiedEmail, browseridArguments);
     }).addClass("clickable").css('opacity','1.0');
 }
 
@@ -126,7 +132,7 @@ function gotVerifiedEmail(assertion) {
 if (document.addEventListener) {
   document.addEventListener("login", function(event) {
     $("header .login").css('opacity', '0.5');
-    navigator.id.getVerifiedEmail(gotVerifiedEmail);
+    navigator.id.get(gotVerifiedEmail, browseridArguments);
   }, false);
 
   document.addEventListener("logout", logout, false);
