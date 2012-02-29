@@ -1,7 +1,7 @@
 var browseridArguments = {
   // display our tos and privacy policy in the browserid dialog
   privacyURL: '/privacy.html',
-  tosURL: '/privacy.html',
+  tosURL: '/tos.html',
 };
 
 function setSessions(val) {
