@@ -66,7 +66,7 @@ app.use(function (req, res, next) {
 // same server, each which uses a different browserid server
 // (dev/beta/prod):
 function determineEnvironment(req) {
-  if (req.headers['host'] === 'myfavoritebeer.org') return 'prod';
+  if (req.headers['host'] === 'myfavoritebeer.org' || req.headers['host'] === 'www.myfavoritebeer.org') return 'prod';
   else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
   else if (req.headers['host'] === 'dev.myfavoritebeer.org') return 'dev';
   else {
