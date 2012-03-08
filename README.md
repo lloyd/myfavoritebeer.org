@@ -68,16 +68,15 @@ with the database aren't important, but if you're curious have a look in db.js.
 
 To run the example code locally:
 
-  0. clone this repository 
-  1. install node (0.4.7+) and npm.
+  0. clone this repository
+  1. install node (0.6.5+) and npm.
   2. `npm install`
-  3. `npm start`
+  3. `PORT=8080 npm start`
 
-On stdout you'll see an ip address and port, like `127.0.0.1:59275`.  Open that
-up in your web browser.
+Now open `http://127.0.0.1:8080` up in your web browser.
 
 **NOTE:** You'll see warnings about how no database is configured.  Don't worry about
-it.  The code is designed to run with or without a configured database so that it's 
+it.  The code is designed to run with or without a configured database so that it's
 easier to play with.  The only downside of running without a database is that your
 server won't remember anything.  Oh well.
 
@@ -90,10 +89,11 @@ the presence of a `Procfile` which tells heroku how to start the server.
 If you'd like to deploy this service to heroku yourself, all you'd have to do is:
 
   1. set up a heroku account (and run through their tutorial)
+  2. create a heroku instance running nodejs 0.6: `heroku create --stack cedar --buildpack http://github.com/hakobera/heroku-buildpack-nodejs.git <appname>`
   2. add a free mongolab instance (for persistence): `heroku addons:add mongolab:starter`
   3. set your app to bind to all available ips: `heroku config:add IP_ADDRESS=0.0.0.0`
   4. set a random string to encrypt cookies: `heroku config:add SEKRET=<long random string>`
-  5. push the code up to heroku!
+  5. push the code up to heroku: `git push heroku master`
 
 **NOTE:**  While the sample is targeted at heroku, with minimal code modifications it
 should run under the hosting environment of your preference.
