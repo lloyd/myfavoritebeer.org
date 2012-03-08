@@ -3,7 +3,7 @@
 // require libraries that we depend on 
 const
 express = require('express'),
-sessions = require('connect-cookie-session'),
+sessions = require('client-sessions'),
 path = require('path'),
 postprocess = require('postprocess'),
 https = require('https'),
@@ -52,7 +52,7 @@ app.use(function (req, res, next) {
         path: '/api',
         httpOnly: true,
         // when you're logged in, you're logged in for an hour
-        maxAge: (1 * 60 * 60 * 1000), 
+        maxAge: (1 * 60 * 60 * 1000),
         secure: false
       }
     })(req, res, next);
@@ -97,7 +97,7 @@ function determineBrowserIDHost(req) {
 }
 
 // a substitution middleware allows us to easily point at different browserid servers
-app.use(postprocess.middleware(function(req, body) {
+app.use(postprocess(function(req, body) {
   var browseridURL = determineBrowserIDURL(req);
   return body.toString().replace(new RegExp("https://browserid.org", 'g'), browseridURL);
 }));
