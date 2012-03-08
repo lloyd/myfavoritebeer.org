@@ -1,0 +1,255 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'lucida grande', helvetica, arial, sans-serif;
+}
+
+/* for floats */
+.cf:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+
+html[xmlns] .cf {
+  display: block;
+}
+
+* html .cf {
+  height: 1%;
+}
+
+
+header {
+    display: block;
+    background-color: #143352;
+    color: #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-height: 50px;
+    width: 100%;
+    border-bottom: 2px solid rgb(15, 38, 61);
+    border-bottom: 2px solid rgba(15, 38, 61, 0.5);
+    -moz-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    z-index: 10;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    opacity: .8;
+}
+header > div {
+    width: 750px;
+    margin: auto;
+}
+
+header h1 {
+    font: 3em/50px "Special Elite";
+    margin: 10px 0 0 0;
+    float: left;
+}
+
+header #loginInfo {
+    float: right;
+    width: 250px;
+}
+
+header .picture {
+    float: left;
+    margin: 10px 10px 0 0;
+}
+
+header .login {
+    float: left;
+    margin-top: 10px;
+    max-width: 208px;
+    text-align: center;
+}
+
+header .login img {
+    margin-top: 3px;
+}
+
+header .login .username {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+header .login div a {
+    font-size: .7em;
+    color: #ccc;
+}
+
+
+header .clickable:hover {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    opacity: .5;
+    cursor: pointer;
+}
+
+#content {
+    position: fixed;
+    color: #fff;
+    padding-top: 50px;
+    top: 0px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    background-color: rgb(220, 217, 202);
+    background-image:url('i/beer.jpg');
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-position:center;
+}
+
+#content .intro, .business {
+    display: none;
+    width: 600px;
+    margin: auto;
+    color: #333;
+    font-size: 2em;
+    font-family: "Shadows Into Light";
+    text-align: center;
+}
+
+#content em {
+    font-size: 1.4em;
+}
+
+#content .business #save {
+    display: none;
+}
+
+#content .business input {
+    background-color: transparent;
+    border: 1px solid #999;
+    font: 3em "Shadows Into Light";
+    padding: .4em;
+    width: 500px;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+}
+
+footer {
+    display: block;
+    background-color: #9d9d9d;
+    color: #313131;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75px;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    opacity: .8;
+}
+
+footer a {
+    color: #000;
+}
+
+footer a:hover {
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    opacity: .5;
+}
+
+footer > div img {
+    border: none;
+    margin-bottom: -.5em;
+}
+
+footer > div {
+    width: 600px;
+    margin: auto;
+    margin-top: 10px;
+    font-size: .8em;
+    text-align: center;
+    font-weight: 200;
+}
+
+footer small {
+    display: block;
+    font-size: .8em;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    opacity: .8;
+    margin-top: 1.5em;
+}
+
+@media screen and (max-device-width: 640px) {
+    header {
+        position: static;
+        height: auto;
+        text-align: center;
+
+        > div {
+            width: auto;
+        }
+
+        h1 {
+            float: none;
+            margin-top: 0;
+            padding-top: 0;
+            font-size: 2em;
+        }
+
+        #loginInfo {
+            float: none;
+            margin: 0 auto;
+        }
+
+    }
+
+    #content {
+        position: static;
+        padding: 10px 0;
+
+        .intro, .business {
+            width: auto;
+            font-size: 1.2em;
+        }
+
+        .business {
+            #save {
+                display: inline-block;
+                color: #333;
+                padding: 10px;
+                border: 1px solid #999;
+                border-radius: 10px;
+                background-color: #ccc;
+            }
+
+            #desktopSave {
+                display: none;
+            }
+
+            input {
+                -webkit-box-sizing: border-box;
+                   -moz-box-sizing: border-box;
+                     -o-box-sizing: border-box;
+                        box-sizing: border-box;
+                width: 95%;
+            }
+        }
+
+        p:first-child {
+            margin-top: 0;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    footer {
+        position: static;
+        height: auto;
+        > div {
+            margin-top: 0;
+            width: auto;
+            font-size: 0.7em;
+        }
+    }
+}
