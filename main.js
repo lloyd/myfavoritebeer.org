@@ -237,7 +237,7 @@ app.post("/api/set", function (req, res) {
 });
 
 // Tell express from where it should serve static resources
-app.use(express.static(path.join(path.dirname(__dirname), "static")));
+app.use(express.static(path.join(__dirname, "static")));
 
 // connect up the database!
 db.connect(function(err) {

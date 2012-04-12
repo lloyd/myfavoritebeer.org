@@ -8,6 +8,6 @@
     "mongodb": "0.9.6-16"
   },
   "scripts": {
-    "start": "node server/main.js"
+    "start": "node main.js"
   }
 }
