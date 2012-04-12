@@ -15,10 +15,10 @@ url = require('url');
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
 // The IP Address to listen on.
-const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
+const IP_ADDRESS = process.env.IP_ADDRESS || process.env.VCAP_APP_HOST || '127.0.0.1';
 
 // The port to listen to.
-const PORT = process.env.PORT || 0;
+const PORT = process.env.PORT || process.env.VCAP_APP_PORT || 0;
 
 // localHostname is the address to which we bind.  It will be used
 // as our external address ('audience' to which assertions will be set)
