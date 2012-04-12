@@ -239,6 +239,15 @@ app.post("/api/set", function (req, res) {
 // Tell express from where it should serve static resources
 app.use(express.static(path.join(__dirname, "static")));
 
+// Be a bit verbose about CloudFoundry status
+if ( process.env.VCAP_APPLICATION ){
+  var vcapApp = JSON.parse(process.env.VCAP_APPLICATION);
+  var vcapName = vcapApp.name;
+  var vcapVersion = vcapApp.version;
+  console.log("Running in CloudFoundry as " + vcapName + "/v." + vcapVersion);
+}
+
+
 // connect up the database!
 db.connect(function(err) {
   havePersistence = (err ? false : true);
