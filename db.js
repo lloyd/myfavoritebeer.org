@@ -9,6 +9,8 @@ const
 url = require('url'),
 mongodb = require('mongodb');
 
+const MONGO_VCAP_VERSION = "mongodb-1.8";
+
 var collections = {
   dev:  undefined,
   beta: undefined,
@@ -23,13 +25,16 @@ exports.connect = function(cb) {
   }
   else if (process.env.VCAP_SERVICES) {
     var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
-    var cfMongo = vcapServices['mongodb-1.8'][0];
-    var cfMongoHost =  cfMongo.credentials.hostname;
-    var cfMongoPort =  cfMongo.credentials.port;
-    var cfMongoUser = cfMongo.credentials.username;
-    var cfMongoPass = cfMongo.credentials.password;
-    var cfMongoName = cfMongo.credentials.db;
-    mongo_uri = "mongodb://" + cfMongoUser + ":" + cfMongoPass + "@" + cfMongoHost + ":" + cfMongoPort + "/" + cfMongoName;
+    if (vcapServices[MONGO_VCAP_VERSION]) {
+      console.log("Using VCAP provided MongoDB");
+      var cfMongo = vcapServices[MONGO_VCAP_VERSION][0];
+      var cfMongoHost =  cfMongo.credentials.hostname;
+      var cfMongoPort =  cfMongo.credentials.port;
+      var cfMongoUser = cfMongo.credentials.username;
+      var cfMongoPass = cfMongo.credentials.password;
+      var cfMongoName = cfMongo.credentials.db;
+      mongo_uri = "mongodb://" + cfMongoUser + ":" + cfMongoPass + "@" + cfMongoHost + ":" + cfMongoPort + "/" + cfMongoName;
+    }
   }
 
   if (!mongo_uri) {
