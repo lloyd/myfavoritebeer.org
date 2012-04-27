@@ -15,10 +15,10 @@ url = require('url');
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
 
 // The IP Address to listen on.
-const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
+const IP_ADDRESS = process.env.IP_ADDRESS || process.env.VCAP_APP_HOST || '127.0.0.1';
 
 // The port to listen to.
-const PORT = process.env.PORT || 0;
+const PORT = process.env.PORT || process.env.VCAP_APP_PORT || 0;
 
 // localHostname is the address to which we bind.  It will be used
 // as our external address ('audience' to which assertions will be set)
@@ -237,7 +237,16 @@ app.post("/api/set", function (req, res) {
 });
 
 // Tell express from where it should serve static resources
-app.use(express.static(path.join(path.dirname(__dirname), "static")));
+app.use(express.static(path.join(__dirname, "static")));
+
+// Be a bit verbose about CloudFoundry status
+if ( process.env.VCAP_APPLICATION ){
+  var vcapApp = JSON.parse(process.env.VCAP_APPLICATION);
+  var vcapName = vcapApp.name;
+  var vcapVersion = vcapApp.version;
+  console.log("Running in CloudFoundry as " + vcapName + "/v." + vcapVersion);
+}
+
 
 // connect up the database!
 db.connect(function(err) {

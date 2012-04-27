@@ -9,6 +9,8 @@ const
 url = require('url'),
 mongodb = require('mongodb');
 
+const MONGO_VCAP_VERSION = "mongodb-1.8";
+
 var collections = {
   dev:  undefined,
   beta: undefined,
@@ -16,12 +18,31 @@ var collections = {
 };
 
 exports.connect = function(cb) {
-  if (!process.env.MONGOLAB_URI) {
+  var mongo_uri;
+
+  if (process.env.MONGOLAB_URI) {
+      mongo_uri = process.env.MONGOLAB_URI;
+  }
+  else if (process.env.VCAP_SERVICES) {
+    var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
+    if (vcapServices[MONGO_VCAP_VERSION]) {
+      console.log("Using VCAP provided MongoDB");
+      var cfMongo = vcapServices[MONGO_VCAP_VERSION][0];
+      var cfMongoHost =  cfMongo.credentials.hostname;
+      var cfMongoPort =  cfMongo.credentials.port;
+      var cfMongoUser = cfMongo.credentials.username;
+      var cfMongoPass = cfMongo.credentials.password;
+      var cfMongoName = cfMongo.credentials.db;
+      mongo_uri = "mongodb://" + cfMongoUser + ":" + cfMongoPass + "@" + cfMongoHost + ":" + cfMongoPort + "/" + cfMongoName;
+    }
+  }
+
+  if (!mongo_uri) {
     cb("no MONGOLAB_URI env var!");
     return;
   }
 
-  var bits = url.parse(process.env.MONGOLAB_URI);
+  var bits = url.parse(mongo_uri);
   var server = new mongodb.Server(bits.hostname, bits.port, {});
   new mongodb.Db(bits.pathname.substr(1), server, {}).open(function (err, cli) {
     if (err) return cb(err);
