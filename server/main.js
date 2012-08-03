@@ -7,6 +7,7 @@ sessions = require('client-sessions'),
 path = require('path'),
 postprocess = require('postprocess'),
 https = require('https'),
+http = require('http'),
 querystring = require('querystring'),
 db = require('./db.js'),
 libravatar = require('libravatar'),
@@ -93,8 +94,25 @@ function determineBrowserIDURL(req) {
   else return 'https://' + e + '.personatest.org';
 }
 
-function determineBrowserIDHost(req) {
-  return determineBrowserIDURL(req).replace(/http(s?):\/\//, '');
+function determineVerifierURL(req) {
+  if (process.env.VERIFIER_URL) return process.env.VERIFIER_URL;
+
+  return determineBrowserIDURL(req);
+}
+
+function determineVerifierScheme(req) {
+  var scheme = url.parse(determineVerifierURL(req)).protocol;
+  return scheme;
+}
+
+function determineVerifierHost(req) {
+  var host = url.parse(determineVerifierURL(req)).hostname;
+  return host;
+}
+
+function determineVerifierPort(req) {
+  var port = url.parse(determineVerifierURL(req)).port || 443;
+  return port;
 }
 
 function respondWithUserInfo(req, res) {
@@ -136,46 +154,54 @@ app.post("/api/login", function (req, res) {
   // To verify the assertion we initiate a POST request to the browserid verifier service.
   // If we didn't want to rely on this service, it's possible to implement verification
   // in a library and to do it ourselves.
-  var vreq = https.request({
-    host: determineBrowserIDHost(req),
-    path: "/verify",
-    method: 'POST'
-  }, function(vres) {
-    var body = "";
-    vres.on('data', function(chunk) { body+=chunk; } )
-        .on('end', function() {
-          try {
-            var verifierResp = JSON.parse(body);
-            var valid = verifierResp && verifierResp.status === "okay";
-            var email = valid ? verifierResp.email : null;
-            req.session.email = email;
-            if (valid) {
-              console.log("assertion verified successfully for email:", email);
-            } else {
-              console.log("failed to verify assertion:", verifierResp.reason);
+  function verify(protocol) {
+    var vreq = protocol.request({
+      host: determineVerifierHost(req),
+      port: determineVerifierPort(req),
+      path: "/verify",
+      method: 'POST'
+    }, function(vres) {
+      console.log('verifier returned');
+      var body = "";
+      vres.on('data', function(chunk) { body+=chunk; } )
+          .on('end', function() {
+            try {
+              var verifierResp = JSON.parse(body);
+              var valid = verifierResp && verifierResp.status === "okay";
+              var email = valid ? verifierResp.email : null;
+              req.session.email = email;
+              if (valid) {
+                console.log("assertion verified successfully for email:", email);
+              } else {
+                console.log("failed to verify assertion:", verifierResp.reason);
+              }
+              respondWithUserInfo(req, res);
+            } catch(e) {
+              console.log("non-JSON response from verifier");
+              // bogus response from verifier!  return null
+              res.json(null);
             }
-            respondWithUserInfo(req, res);
-          } catch(e) {
-            console.log("non-JSON response from verifier");
-            // bogus response from verifier!  return null
-            res.json(null);
-          }
-        });
-  });
-  vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+          });
+    });
+    vreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-  // An "audience" argument is embedded in the assertion and must match our hostname.
-  // Because this one server runs on multiple different domain names we just use
-  // the host parameter out of the request.
-  var audience = req.headers['host'] ? req.headers['host'] : localHostname;
-  var data = querystring.stringify({
-    assertion: req.body.assertion,
-    audience: audience
-  });
-  vreq.setHeader('Content-Length', data.length);
-  vreq.write(data);
-  vreq.end();
-  console.log("verifying assertion!");
+    // An "audience" argument is embedded in the assertion and must match our hostname.
+    // Because this one server runs on multiple different domain names we just use
+    // the host parameter out of the request.
+    var audience = req.headers['host'] ? req.headers['host'] : localHostname;
+    var data = querystring.stringify({
+      assertion: req.body.assertion,
+      audience: audience
+    });
+    vreq.setHeader('Content-Length', data.length);
+    vreq.write(data);
+    vreq.end();
+    console.log("verifying assertion!");
+    return vreq;
+  }
+
+  var scheme = determineVerifierScheme(req);
+  verify(scheme === "https:" ? https : http);
 });
 
 // /api/logout clears the session cookie, effectively terminating the current session.
