@@ -111,7 +111,12 @@ function determineVerifierHost(req) {
 }
 
 function determineVerifierPort(req) {
-  var port = url.parse(determineVerifierURL(req)).port || 443;
+  var port = url.parse(determineVerifierURL(req)).port;
+  if (!port) {
+    var scheme = determineVerifierScheme(req);
+    if (scheme === "https:") port = 443;
+    else if (scheme === "http:") port = 80;
+  }
   return port;
 }
 
