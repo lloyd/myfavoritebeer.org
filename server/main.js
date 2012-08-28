@@ -89,7 +89,7 @@ function determineBrowserIDURL(req) {
 
   var e = determineEnvironment(req);
   if (staticEnvs[e]) return staticEnvs[e];
-  else return 'https://' + e + '.hacksign.in';
+  else return 'https://' + e + '.personatest.org';
 }
 
 function determineBrowserIDHost(req) {
