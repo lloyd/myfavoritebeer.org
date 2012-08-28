@@ -1,4 +1,7 @@
 {
-  "processes": [ "./server/main.js" ]
+  "processes": [ "./server/main.js" ],
+  "env": {
+    "MONGOLAB_URI": "mongodb://beer:thisismyfavoritebeer@127.0.0.1:27017/myfavoritebeer"
+  }
 }
 
