@@ -64,15 +64,17 @@ function loggedIn(email, immediate) {
 
 function save(event) {
   event.preventDefault();
+  var input = $("#content input")
+  input.fadeTo(200, 0);
   $.ajax({
     type: 'POST',
     url: '/api/set',
-    data: { beer: $("input").val() },
+    data: { beer: input.val() },
     success: function(res, status, xhr) {
-      // noop
+      input.stop(true,true);
+      input.fadeTo(400, 1);
     }
   });
-  $("#content input").fadeOut(200).fadeIn(400);
 }
 
 // when the user clicks logout, we'll make a call to the server to clear
