@@ -1,11 +1,14 @@
 {
   "name": "myfavoritebeer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
-    "express": "2.5.8",
+    "express": "2.5.11",
     "postprocess": "0.2.4",
     "client-sessions" : "0.0.3",
     "mongodb": "0.9.6-16"
+  },
+  "devDependencies": {
+    "awsbox": "*"
   },
   "scripts": {
     "start": "node server/main.js"
