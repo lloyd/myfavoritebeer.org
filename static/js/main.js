@@ -108,7 +108,6 @@ function loggedOut() {
 // a handler that is passed an assertion after the user logs in via the
 // browserid dialog
 function gotVerifiedEmail(assertion) {
-  console.log("gotVerifiedEmail: " + assertion);
   // got an assertion, now send it up to the server for verification
   if (assertion !== null) {
     $.ajax({
