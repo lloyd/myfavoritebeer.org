@@ -65,14 +65,14 @@ function loggedIn(email, immediate) {
 function save(event) {
   event.preventDefault();
   var input = $("#content input")
-  input.fadeOut(200);
+  input.fadeTo(200, 0);
   $.ajax({
     type: 'POST',
     url: '/api/set',
     data: { beer: input.val() },
     success: function(res, status, xhr) {
       input.stop(true,true);
-      input.fadeIn(400);
+      input.fadeTo(400, 1);
     }
   });
 }
