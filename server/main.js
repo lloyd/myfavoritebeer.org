@@ -9,6 +9,7 @@ postprocess = require('postprocess'),
 https = require('https'),
 querystring = require('querystring'),
 db = require('./db.js'),
+libravatar = require('libravatar'),
 url = require('url');
 
 // the key with which session cookies are encrypted
@@ -107,8 +108,17 @@ app.use(postprocess(function(req, body) {
 // it returns a JSON encoded string containing the currently authenticated user's email
 // if someone is logged in, otherwise it returns null.
 app.get("/api/whoami", function (req, res) {
-  if (req.session && typeof req.session.email === 'string') return res.json(req.session.email);
-  return res.json(null);
+  if (req.session && typeof req.session.email === 'string') {
+    libravatar.url({email: req.session.email, size: 32, http: false},
+      function (error, avatar) {
+        if (error) {
+          return res.json({'email': req.session.email, 'avatar': ''});
+        }
+        return res.json({'email': req.session.email, 'avatar': avatar});
+      });
+  } else {
+    return res.json(null);
+  }
 });
 
 
@@ -139,7 +149,13 @@ app.post("/api/login", function (req, res) {
             } else {
               console.log("failed to verify assertion:", verifierResp.reason);
             }
-            res.json(email);
+            libravatar.url({email: req.session.email, size: 32, http: false},
+              function (error, avatar) {
+                if (error) {
+                  res.json({'email': req.session.email, 'avatar': ''});
+                }
+                res.json({'email': req.session.email, 'avatar': avatar});
+              });
           } catch(e) {
             console.log("non-JSON response from verifier");
             // bogus response from verifier!  return null
