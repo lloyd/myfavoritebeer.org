@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// require libraries that we depend on 
+// require libraries that we depend on
 const
 express = require('express'),
 sessions = require('client-sessions'),
@@ -9,6 +9,7 @@ postprocess = require('postprocess'),
 https = require('https'),
 querystring = require('querystring'),
 db = require('./db.js'),
+libravatar = require('libravatar'),
 url = require('url');
 
 // the key with which session cookies are encrypted
@@ -96,6 +97,17 @@ function determineBrowserIDHost(req) {
   return determineBrowserIDURL(req).replace(/http(s?):\/\//, '');
 }
 
+function respondWithUserInfo(req, res) {
+  libravatar.url({email: req.session.email, size: 32, http: false},
+    function (error, avatar) {
+      if (error) {
+        return res.json({'email': req.session.email, 'avatar': ''});
+      }
+      return res.json({'email': req.session.email, 'avatar': avatar});
+    });
+}
+
+
 // a substitution middleware allows us to easily point at different browserid servers
 app.use(postprocess(function(req, body) {
   var browseridURL = determineBrowserIDURL(req);
@@ -107,12 +119,15 @@ app.use(postprocess(function(req, body) {
 // it returns a JSON encoded string containing the currently authenticated user's email
 // if someone is logged in, otherwise it returns null.
 app.get("/api/whoami", function (req, res) {
-  if (req.session && typeof req.session.email === 'string') return res.json(req.session.email);
-  return res.json(null);
+  if (req.session && typeof req.session.email === 'string') {
+    respondWithUserInfo(req, res);
+  } else {
+    return res.json(null);
+  }
 });
 
 
-// /api/login is an API which authenticates the current session.  The client includes 
+// /api/login is an API which authenticates the current session.  The client includes
 // an assertion in the post body (returned by browserid's navigator.id.getVerifiedEmail()).
 // if the assertion is valid an (encrypted) cookie is set to start the user's session.
 // returns a json encoded email if the session is successfully authenticated, otherwise
@@ -120,7 +135,7 @@ app.get("/api/whoami", function (req, res) {
 app.post("/api/login", function (req, res) {
   // To verify the assertion we initiate a POST request to the browserid verifier service.
   // If we didn't want to rely on this service, it's possible to implement verification
-  // in a library and to do it ourselves.  
+  // in a library and to do it ourselves.
   var vreq = https.request({
     host: determineBrowserIDHost(req),
     path: "/verify",
@@ -139,7 +154,7 @@ app.post("/api/login", function (req, res) {
             } else {
               console.log("failed to verify assertion:", verifierResp.reason);
             }
-            res.json(email);
+            respondWithUserInfo(req, res);
           } catch(e) {
             console.log("non-JSON response from verifier");
             // bogus response from verifier!  return null
@@ -152,7 +167,7 @@ app.post("/api/login", function (req, res) {
   // An "audience" argument is embedded in the assertion and must match our hostname.
   // Because this one server runs on multiple different domain names we just use
   // the host parameter out of the request.
-  var audience = req.headers['host'] ? req.headers['host'] : localHostname;   
+  var audience = req.headers['host'] ? req.headers['host'] : localHostname;
   var data = querystring.stringify({
     assertion: req.body.assertion,
     audience: audience
@@ -190,7 +205,7 @@ app.get("/api/get", function (req, res) {
 
   db.get(determineEnvironment(req), email, function(err, beer) {
     if (err) {
-      console.log("error getting beer for", email); 
+      console.log("error getting beer for", email);
       res.writeHead(500);
       res.end();
     } else {
@@ -227,7 +242,7 @@ app.post("/api/set", function (req, res) {
 
   db.set(determineEnvironment(req), email, beer, function(err) {
     if (err) {
-      console.log("setting beer for", email, "to", beer); 
+      console.log("setting beer for", email, "to", beer);
       res.writeHead(500);
       res.end();
     } else {
