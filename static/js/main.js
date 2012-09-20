@@ -98,7 +98,7 @@ function loggedOut() {
   $('.intro').fadeIn(300);
   $("header .picture").empty();
   var l = $("header .login").removeClass('clickable');
-  l.html('<img src="i/sign_in_blue.png" alt="Sign in">')
+  l.html('<img src="i/persona_sign_in_blue.png" alt="Sign in">')
     .show().one('click', function() {
       $("header .login").css('opacity', '0.5');
       navigator.id.get(gotVerifiedEmail, browseridArguments);
