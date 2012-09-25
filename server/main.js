@@ -79,10 +79,10 @@ function determineEnvironment(req) {
 }
 
 const staticEnvs = {
-  prod:   'https://browserid.org',
-  beta:   'https://diresworb.org',
-  dev:    'https://dev.diresworb.org',
-  local:  'https://dev.diresworb.org'
+  prod:   'https://login.persona.org',
+  beta:   'https://login.anosrep.org',
+  dev:    'https://login.dev.anosrep.org',
+  local:  'https://login.dev.anosrep.org'
 };
 
 function determineBrowserIDURL(req) {
@@ -134,7 +134,7 @@ function respondWithUserInfo(req, res) {
 // a substitution middleware allows us to easily point at different browserid servers
 app.use(postprocess(function(req, body) {
   var browseridURL = determineBrowserIDURL(req);
-  return body.toString().replace(new RegExp("https://browserid.org", 'g'), browseridURL);
+  return body.toString().replace(new RegExp("https://login.persona.org", 'g'), browseridURL);
 }));
 
 
