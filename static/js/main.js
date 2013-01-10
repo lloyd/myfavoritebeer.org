@@ -5,18 +5,10 @@ var browseridArguments = {
   siteName: 'My Favorite Beer'
 };
 
-function setSessions(val) {
-  if (navigator.id) {
-    navigator.id.sessions = val ? val : [ ];
-  }
-}
-
 // when the user is found to be logged in we'll update the UI, fetch and
 // display the user's favorite beer from the server, and set up handlers to
 // wait for user input (specifying their favorite beer).
 function loggedIn(user, immediate) {
-  setSessions([ { email: user.email } ]);
-
   // set the user visible display
   var l = $("header .login").removeClass('clickable');;
   l.empty();
@@ -92,7 +84,6 @@ function logout(event) {
 // when no user is logged in, we'll display a "sign-in" button
 // which will call into browserid when clicked.
 function loggedOut() {
-  setSessions();
   $("input").val("");
   $("#content .business").hide();
   $('.intro').fadeIn(300);
