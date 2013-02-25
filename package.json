@@ -4,9 +4,12 @@
   "dependencies": {
     "express": "2.5.11",
     "postprocess": "0.2.4",
-    "client-sessions" : "0.0.3",
+    "client-sessions" : "0.0.9",
     "libravatar": "2.0.0",
-    "mongodb": "0.9.6-16"
+    "mongodb": "0.9.6-16",
+    "connect-fonts": "0.0.9-alpha8",
+    "connect-fonts-shadows-into-light": "0.0.1",
+    "connect-fonts-specialelite": "0.0.1"
   },
   "devDependencies": {
     "awsbox": "*"

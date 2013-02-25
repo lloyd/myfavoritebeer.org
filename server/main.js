@@ -11,7 +11,10 @@ http = require('http'),
 querystring = require('querystring'),
 db = require('./db.js'),
 libravatar = require('libravatar'),
-url = require('url');
+url = require('url'),
+fonts = require('connect-fonts'),
+font_shadows_into_light = require('connect-fonts-shadows-into-light'),
+font_special_elite = require('connect-fonts-specialelite');
 
 // the key with which session cookies are encrypted
 const COOKIE_SECRET = process.env.SEKRET || 'you love, i love, we all love beer!';
@@ -41,6 +44,12 @@ app.use(express.cookieParser());
 
 // parse post bodies
 app.use(express.bodyParser());
+
+// font middleware
+app.use(fonts.setup({
+  fonts: [ font_special_elite, font_shadows_into_light ],
+  allow_origin: "*"
+}));
 
 // session support using signed cookies, also no caching of api requests
 app.use(function (req, res, next) {
