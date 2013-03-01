@@ -268,7 +268,7 @@ app.post("/api/set", function (req, res) {
 
   var beer = req.body.beer;
 
-  if (!beer) {
+  if (typeof beer === 'undefined') {
     res.writeHead(400, {"Content-Type": "text/plain"});
     res.write("Bad Request: a 'beer' parameter is required to set your favorite beer");
     res.end();
