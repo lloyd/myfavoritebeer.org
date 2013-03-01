@@ -55,7 +55,8 @@ exports.get = function(collection, email, cb) {
   var c = collections[collection].find({ email: email }, { beer: 1 });
   c.toArray(function(err, docs) {
     if (err) return cb(err);
-    if (docs.length != 1) return cb("consistency error!  more than one doc returned!");
+    if (docs.length > 1) return cb("consistency error!  more than one doc returned!");
+    if (docs.length === 0) return cb(undefined, '');
     cb(undefined, docs[0].beer);
   });
 };
