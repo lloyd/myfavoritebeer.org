@@ -80,6 +80,7 @@ function determineEnvironment(req) {
   if (req.headers['host'] === 'myfavoritebeer.org' || req.headers['host'] === 'www.myfavoritebeer.org') return 'prod';
   else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
   else if (req.headers['host'] === 'dev.myfavoritebeer.org') return 'dev';
+  else if (req.headers['host'] === 'native.myfavoritebeer.org') return 'native';
   else {
     var m = /^(.*)\.myfavoritebeer\.org$/.exec(req.headers['host']);
     if (m) return m[1];
@@ -91,6 +92,7 @@ const staticEnvs = {
   prod:   'https://browserid.org',
   beta:   'https://diresworb.org',
   dev:    'https://dev.diresworb.org',
+  native: 'https://native-persona.org',
   local:  'https://dev.diresworb.org'
 };
 
