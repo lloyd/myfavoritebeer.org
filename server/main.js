@@ -81,6 +81,7 @@ function determineEnvironment(req) {
   else if (req.headers['host'] === 'beta.myfavoritebeer.org') return 'beta';
   else if (req.headers['host'] === 'dev.myfavoritebeer.org') return 'dev';
   else if (req.headers['host'] === 'native.myfavoritebeer.org') return 'native';
+  else if (req.headers['host'] === 'firefoxos.myfavoritebeer.org') return 'fxos';
   else {
     var m = /^(.*)\.myfavoritebeer\.org$/.exec(req.headers['host']);
     if (m) return m[1];
@@ -93,6 +94,7 @@ const staticEnvs = {
   beta:   'https://diresworb.org',
   dev:    'https://dev.diresworb.org',
   native: 'https://native-persona.org',
+  fxos:   'https://firefoxos.persona.org',
   local:  'https://dev.diresworb.org'
 };
 
